@@ -43,7 +43,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 /**
- * <p> MongoDevUtilService class. </p>
+ * <p>
+ * MongoDevUtilService class.
+ * </p>
  *
  * @author rajakolli
  * @version 1: 0
@@ -51,14 +53,19 @@ import com.mongodb.client.MongoDatabase;
 @RequestMapping(value = "/assetwrapper/search")
 @RestController
 public class MongoDevUtilService {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(MongoDevUtilService.class);
 
-	@Autowired AssetWrapperRepository assetWrapperRepository;
-	@Autowired AddressRepository addressRepository;
-	@Autowired NotesRepository notesRepository;
-	
-	@Autowired MongoTemplate mongoTemplate;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(MongoDevUtilService.class);
+
+	@Autowired
+	AssetWrapperRepository assetWrapperRepository;
+	@Autowired
+	AddressRepository addressRepository;
+	@Autowired
+	NotesRepository notesRepository;
+
+	@Autowired
+	MongoTemplate mongoTemplate;
 
 	/**
 	 * <p>
@@ -72,11 +79,14 @@ public class MongoDevUtilService {
 	@Secured({ "ROLE_USER" })
 	public String extractRestaurants() throws InterruptedException {
 		List<MongoCredential> credentialsList = new ArrayList<>();
-		credentialsList.add(MongoCredential.createCredential("testAdmin", "test", "password".toCharArray()));
-		ServerAddress addr = new ServerAddress(new InetSocketAddress(Constants.LOCALHOST,Constants.PRIMARYPORT));
+		credentialsList.add(MongoCredential.createCredential("testAdmin", "test",
+				"password".toCharArray()));
+		ServerAddress addr = new ServerAddress(
+				new InetSocketAddress(Constants.LOCALHOST, Constants.PRIMARYPORT));
 		MongoClient mongoClient = new MongoClient(addr, credentialsList);
 		final MongoDatabase database = mongoClient.getDatabase("test");
-		MongoCollection<Document> collection = database.getCollection("restaurants", Document.class);
+		MongoCollection<Document> collection = database.getCollection("restaurants",
+				Document.class);
 		List<Document> res = collection.find().into(new ArrayList<Document>());
 
 		StopWatch stopWatch = new StopWatch();
@@ -84,11 +94,13 @@ public class MongoDevUtilService {
 		transformAndInsert(res);
 		mongoClient.close();
 		stopWatch.stop();
-		return "Inserted " + assetWrapperRepository.count() + " documents in " + stopWatch.getTotalTimeSeconds() + " sec";
+		return "Inserted " + assetWrapperRepository.count() + " documents in "
+				+ stopWatch.getTotalTimeSeconds() + " sec";
 	}
 
 	@SuppressWarnings("unchecked")
-	private void transformAndInsert(List<Document> resultList) throws InterruptedException {
+	private void transformAndInsert(List<Document> resultList)
+			throws InterruptedException {
 		addressRepository.deleteAll();
 		notesRepository.deleteAll();
 		assetWrapperRepository.deleteAll();
@@ -99,9 +111,11 @@ public class MongoDevUtilService {
 			Address address = new Address();
 			Document addressDocument = (Document) res.get("address");
 			address.setBuilding(addressDocument.getString("building"));
-			String val = addressDocument.get("coord").toString().replace("[", "").replace("]", "");
+			String val = addressDocument.get("coord").toString().replace("[", "")
+					.replace("]", "");
 			if (val != null && val.length() > 0) {
-				Point point = new Point(Double.valueOf(val.split(",")[0]), Double.valueOf(val.split(",")[1]));
+				Point point = new Point(Double.valueOf(val.split(",")[0]),
+						Double.valueOf(val.split(",")[1]));
 				address.setLocation(new GeoJsonPoint(point));
 			}
 			address.setStreet(addressDocument.getString("street"));
@@ -121,25 +135,25 @@ public class MongoDevUtilService {
 			assetwrapper.setNotes(notesList);
 			assetwrapper.setAssetName(res.getString("name"));
 			assetwrapper.setOrgAssetId(res.getString("restaurant_id"));
-			/*try{
-				addressRepository.save(address);
-				assetWrapperRepository.save(assetwrapper);
-			}catch(Exception e)
-			{
-				e.getStackTrace();
-			}
-			Thread.sleep(500);*/
+			/*
+			 * try{ addressRepository.save(address);
+			 * assetWrapperRepository.save(assetwrapper); }catch(Exception e) {
+			 * e.getStackTrace(); } Thread.sleep(500);
+			 */
 			assetWrapperList.add(assetwrapper);
 		}
 		try {
 			assetWrapperRepository.save(assetWrapperList);
-		} catch (MongoException e) {
+		}
+		catch (MongoException e) {
 			LOGGER.error("Exception :{}", e.getMessage(), e);
 		}
 	}
 
 	/**
-	 * <p>updateDate.</p>
+	 * <p>
+	 * updateDate.
+	 * </p>
 	 */
 	@RequestMapping(value = "/updateDate")
 	public void updateDate() {
@@ -148,48 +162,71 @@ public class MongoDevUtilService {
 		do {
 			all = assetWrapperRepository.findAll(new PageRequest(i, Constants.PAGESIZE));
 			for (AssetWrapper assetWrapper : all) {
-				if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == Constants.ONE) {
+				if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == Constants.ONE) {
 					Date value = new DateTime().minusMonths(Constants.ONE).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == Constants.TWO) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == Constants.TWO) {
 					Date value = new DateTime().minusMonths(Constants.TWO).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == Constants.THREE) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == Constants.THREE) {
 					Date value = new DateTime().minusMonths(Constants.THREE).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 4) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 4) {
 					Date value = new DateTime().minusMonths(4).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 5) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 5) {
 					Date value = new DateTime().minusMonths(5).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 6) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 6) {
 					Date value = new DateTime().minusMonths(6).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 7) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 7) {
 					Date value = new DateTime().minusMonths(7).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 8) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 8) {
 					Date value = new DateTime().minusMonths(8).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 9) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 9) {
 					Date value = new DateTime().minusMonths(9).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 10) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 10) {
 					Date value = new DateTime().minusMonths(10).toDate();
 					updateCreatedValue(assetWrapper, value);
-				} else if (Integer.parseInt(assetWrapper.getOrgAssetId()) % Constants.TWELVE == 11) {
+				}
+				else if (Integer.parseInt(assetWrapper.getOrgAssetId())
+						% Constants.TWELVE == 11) {
 					Date value = new DateTime().minusMonths(11).toDate();
 					updateCreatedValue(assetWrapper, value);
 				}
 			}
 			i++;
-		} while (all.hasNext());
+		}
+		while (all.hasNext());
 	}
 
 	private void updateCreatedValue(AssetWrapper assetWrapper, Date value) {
 		Query query = new Query(Criteria.where("_id").is(assetWrapper.getId()));
-		Update update = new Update().set("lDate", value).set("lastModifiedBy", "appAdmin");
+		Update update = new Update().set("lDate", value).set("lastModifiedBy",
+				"appAdmin");
 		mongoTemplate.updateFirst(query, update, AssetWrapper.class);
 	}
 
@@ -219,14 +256,17 @@ public class MongoDevUtilService {
 	public void verifySetMembers() throws Exception {
 
 		List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
-		credentialsList.add(MongoCredential.createCredential("appAdmin", "admin", "password".toCharArray()));
-		ServerAddress addr = new ServerAddress(new InetSocketAddress(Constants.LOCALHOST,Constants.TERITORYPORT));
+		credentialsList.add(MongoCredential.createCredential("appAdmin", "admin",
+				"password".toCharArray()));
+		ServerAddress addr = new ServerAddress(
+				new InetSocketAddress(Constants.LOCALHOST, Constants.TERITORYPORT));
 		MongoClientOptions mongoClientOptions = MongoClientOptions.builder()
 				.readPreference(ReadPreference.secondaryPreferred()).build();
 		MongoClient mongo = new MongoClient(addr, credentialsList, mongoClientOptions);
 		// mongo.slaveOk();
 		// mongo.getDatabase("deloitte").getCollection("assetwrapper").drop();
-		final Document result = mongo.getDatabase("admin").runCommand(new Document("replSetGetStatus", 1));
+		final Document result = mongo.getDatabase("admin")
+				.runCommand(new Document("replSetGetStatus", 1));
 
 		final List<Document> members = (List<Document>) result.get("members");
 

@@ -21,41 +21,42 @@ import com.mongodb.DBObject;
  * @version 1:0
  */
 public class ObjectConverters {
-  /**
-   * <p>
-   * getConvertersToRegister.
-   * </p>
-   *
-   * @return a {@link java.util.List} object.
-   */
-  public static List<Converter<?, ?>> getConvertersToRegister() {
-    List<Converter<?, ?>> list = new ArrayList<Converter<?, ?>>();
-    list.add(DbObjectToUserConverter.INSTANCE);
-    // list.add(UserToDbObjectConverter.INSTANCE);
-    return list;
-  }
+	/**
+	 * <p>
+	 * getConvertersToRegister.
+	 * </p>
+	 *
+	 * @return a {@link java.util.List} object.
+	 */
+	public static List<Converter<?, ?>> getConvertersToRegister() {
+		List<Converter<?, ?>> list = new ArrayList<Converter<?, ?>>();
+		list.add(DbObjectToUserConverter.INSTANCE);
+		return list;
+	}
 
-  @ReadingConverter
-  public static enum DbObjectToUserConverter implements Converter<DBObject, User> {
-    INSTANCE;
+	@ReadingConverter
+	public static enum DbObjectToUserConverter implements Converter<DBObject, User> {
+		INSTANCE;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public User convert(DBObject source) {
+		@SuppressWarnings("unchecked")
+		@Override
+		public User convert(DBObject source) {
 
-      if (source == null) {
-        return null;
-      }
+			if (source == null) {
+				return null;
+			}
 
-      List<BasicDBObject> db0 = (List<BasicDBObject>) source.get("roles");
-      List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(db0.size());
+			List<BasicDBObject> db0 = (List<BasicDBObject>) source.get("roles");
+			List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(
+					db0.size());
 
-      for (BasicDBObject role : db0) {
-        authorities.add(new SimpleGrantedAuthority(role.getString("role")));
-      }
+			for (BasicDBObject role : db0) {
+				authorities.add(new SimpleGrantedAuthority(role.getString("role")));
+			}
 
-      return new User(source.get("_id").toString(), source.get("userName").toString(),
-          source.get("password").toString(), authorities);
-    }
-  }
+			return new User(source.get("_id").toString(),
+					source.get("userName").toString(), source.get("password").toString(),
+					authorities);
+		}
+	}
 }

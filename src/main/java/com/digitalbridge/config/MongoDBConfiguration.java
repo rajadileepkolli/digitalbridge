@@ -31,7 +31,9 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
 /**
- * <p>MongoDBConfiguration class.</p>
+ * <p>
+ * MongoDBConfiguration class.
+ * </p>
  *
  * @author rajakolli
  * @version 1:0
@@ -39,153 +41,161 @@ import com.mongodb.ServerAddress;
 @Configuration
 public class MongoDBConfiguration extends AbstractMongoConfiguration {
 
-  private static final String DATABASE = "digitalbridge";
-  
-  @Value("${mongo.primaryhost}")
-  private String primaryhost;
-  
-  @Value("${mongo.secondaryhost}")
-  private String secondaryhost;
-  
-  @Value("${mongo.teritoryhost}")
-  private String teritoryhost;
-  
-  @Value("${mongo.replicasetname}")
-  private String replicasetName;
-  
-  @Value("${mongo.superadminpassword}")
-  private String superadminpassword;
+	private static final String DATABASE = "digitalbridge";
 
-  @Value("${mongo.primaryport}")
-  private int primaryport;
-  
-  @Value("${mongo.secondaryport}")
-  private int secondaryport;
-  
-  @Value("${mongo.teritoryport}")
-  private int teritoryport;
+	@Value("${mongo.primaryhost}")
+	private String primaryhost;
 
-  /** {@inheritDoc} */
-  @Override
-  protected String getDatabaseName() {
-    return DATABASE;
-  }
+	@Value("${mongo.secondaryhost}")
+	private String secondaryhost;
 
-  /** {@inheritDoc} */
-  @Override
-  public Mongo mongo() throws Exception {
-    return null;
-  }
+	@Value("${mongo.teritoryhost}")
+	private String teritoryhost;
 
-  /** {@inheritDoc} */
-  @Override
-  protected String getMappingBasePackage() {
-    return "com.digitalbridge.domain";
-  }
+	@Value("${mongo.replicasetname}")
+	private String replicasetName;
 
-  /**
-   * <p>
-   * mongoClient.
-   * </p>
-   *
-   * @return a {@link com.mongodb.MongoClient} object.
-   */
-  @Bean
-  public MongoClient mongoClient() {
-    List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
-    credentialsList
-        .add(MongoCredential.createCredential("digitalbridgeAdmin", DATABASE, superadminpassword.toCharArray()));
-    ServerAddress primary = new ServerAddress(new InetSocketAddress(primaryhost, primaryport));
-    ServerAddress secondary = new ServerAddress(new InetSocketAddress(secondaryhost, secondaryport));
-    ServerAddress teritory = new ServerAddress(new InetSocketAddress(teritoryhost, teritoryport));
-    List<ServerAddress> seeds = Arrays.asList(primary, secondary, teritory);
-    MongoClientOptions mongoClientOptions = MongoClientOptions.builder().requiredReplicaSetName(replicasetName).build();
-    return new MongoClient(seeds, credentialsList, mongoClientOptions);
-  }
+	@Value("${mongo.superadminpassword}")
+	private String superadminpassword;
 
-  /**
-   * <p>
-   * mongoDbFactory.
-   * </p>
-   *
-   * @return a {@link org.springframework.data.mongodb.MongoDbFactory} object.
-   */
-  public MongoDbFactory mongoDbFactory() {
-    return new SimpleMongoDbFactory(mongoClient(), getDatabaseName());
-  }
+	@Value("${mongo.primaryport}")
+	private int primaryport;
 
-  /**
-   * <p>
-   * mongoTemplate.
-   * </p>
-   *
-   * @return a {@link org.springframework.data.mongodb.core.MongoTemplate} object.
-   */
-  @Bean
-  public MongoTemplate mongoTemplate() {
-    return new MongoTemplate(mongoDbFactory(), mongoConverter());
-  }
+	@Value("${mongo.secondaryport}")
+	private int secondaryport;
 
-  /**
-   * <p>
-   * mongoConverter.
-   * </p>
-   *
-   * @return a {@link org.springframework.data.mongodb.core.convert.MappingMongoConverter} object.
-   */
-  @Bean
-  public MappingMongoConverter mongoConverter() {
-    MongoMappingContext mappingContext = new MongoMappingContext();
-    DefaultDbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory());
-    MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
-    mongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-    mongoConverter.setCustomConversions(customConversions());
-    return mongoConverter;
-  }
+	@Value("${mongo.teritoryport}")
+	private int teritoryport;
 
-  /** {@inheritDoc} */
-  @Override
-  @Bean
-  public CustomConversions customConversions() {
-    List<Converter<?, ?>> converters = new ArrayList<Converter<?, ?>>();
-    converters.addAll(ObjectConverters.getConvertersToRegister());
-    return new CustomConversions(converters);
-  }
+	/** {@inheritDoc} */
+	@Override
+	protected String getDatabaseName() {
+		return DATABASE;
+	}
 
-  /**
-   * <p>
-   * exceptionTranslator.
-   * </p>
-   *
-   * @return a {@link org.springframework.data.mongodb.core.MongoExceptionTranslator} object.
-   */
-  @Bean
-  public MongoExceptionTranslator exceptionTranslator() {
-    return new MongoExceptionTranslator();
-  }
+	/** {@inheritDoc} */
+	@Override
+	public Mongo mongo() throws Exception {
+		return null;
+	}
 
-  /**
-   * <p>
-   * auditorProvider.
-   * </p>
-   *
-   * @return a {@link org.springframework.data.domain.AuditorAware} object.
-   */
-  @Bean
-  public AuditorAware<String> auditorProvider() {
-    return new MongoAuditorProvider<String>();
-  }
+	/** {@inheritDoc} */
+	@Override
+	protected String getMappingBasePackage() {
+		return "com.digitalbridge.domain";
+	}
 
-  /**
-   * <p>
-   * cascadingMongoEventListener.
-   * </p>
-   *
-   * @return a {@link com.digitalbridge.mongodb.event.CascadeSaveMongoEventListener} object.
-   */
-  @Bean
-  public CascadeSaveMongoEventListener cascadingMongoEventListener() {
-    return new CascadeSaveMongoEventListener();
-  }
+	/**
+	 * <p>
+	 * mongoClient.
+	 * </p>
+	 *
+	 * @return a {@link com.mongodb.MongoClient} object.
+	 */
+	@Bean
+	public MongoClient mongoClient() {
+		List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
+		credentialsList.add(MongoCredential.createCredential("digitalbridgeAdmin",
+				DATABASE, superadminpassword.toCharArray()));
+		ServerAddress primary = new ServerAddress(
+				new InetSocketAddress(primaryhost, primaryport));
+		ServerAddress secondary = new ServerAddress(
+				new InetSocketAddress(secondaryhost, secondaryport));
+		ServerAddress teritory = new ServerAddress(
+				new InetSocketAddress(teritoryhost, teritoryport));
+		List<ServerAddress> seeds = Arrays.asList(primary, secondary, teritory);
+		MongoClientOptions mongoClientOptions = MongoClientOptions.builder()
+				.requiredReplicaSetName(replicasetName).build();
+		return new MongoClient(seeds, credentialsList, mongoClientOptions);
+	}
+
+	/**
+	 * <p>
+	 * mongoDbFactory.
+	 * </p>
+	 *
+	 * @return a {@link org.springframework.data.mongodb.MongoDbFactory} object.
+	 */
+	public MongoDbFactory mongoDbFactory() {
+		return new SimpleMongoDbFactory(mongoClient(), getDatabaseName());
+	}
+
+	/**
+	 * <p>
+	 * mongoTemplate.
+	 * </p>
+	 *
+	 * @return a {@link org.springframework.data.mongodb.core.MongoTemplate} object.
+	 */
+	@Bean
+	public MongoTemplate mongoTemplate() {
+		return new MongoTemplate(mongoDbFactory(), mongoConverter());
+	}
+
+	/**
+	 * <p>
+	 * mongoConverter.
+	 * </p>
+	 *
+	 * @return a
+	 * {@link org.springframework.data.mongodb.core.convert.MappingMongoConverter} object.
+	 */
+	@Bean
+	public MappingMongoConverter mongoConverter() {
+		MongoMappingContext mappingContext = new MongoMappingContext();
+		DefaultDbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory());
+		MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver,
+				mappingContext);
+		mongoConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
+		mongoConverter.setCustomConversions(customConversions());
+		return mongoConverter;
+	}
+
+	/** {@inheritDoc} */
+	@Override
+	@Bean
+	public CustomConversions customConversions() {
+		List<Converter<?, ?>> converters = new ArrayList<Converter<?, ?>>();
+		converters.addAll(ObjectConverters.getConvertersToRegister());
+		return new CustomConversions(converters);
+	}
+
+	/**
+	 * <p>
+	 * exceptionTranslator.
+	 * </p>
+	 *
+	 * @return a {@link org.springframework.data.mongodb.core.MongoExceptionTranslator}
+	 * object.
+	 */
+	@Bean
+	public MongoExceptionTranslator exceptionTranslator() {
+		return new MongoExceptionTranslator();
+	}
+
+	/**
+	 * <p>
+	 * auditorProvider.
+	 * </p>
+	 *
+	 * @return a {@link org.springframework.data.domain.AuditorAware} object.
+	 */
+	@Bean
+	public AuditorAware<String> auditorProvider() {
+		return new MongoAuditorProvider<String>();
+	}
+
+	/**
+	 * <p>
+	 * cascadingMongoEventListener.
+	 * </p>
+	 *
+	 * @return a {@link com.digitalbridge.mongodb.event.CascadeSaveMongoEventListener}
+	 * object.
+	 */
+	@Bean
+	public CascadeSaveMongoEventListener cascadingMongoEventListener() {
+		return new CascadeSaveMongoEventListener();
+	}
 
 }

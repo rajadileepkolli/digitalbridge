@@ -27,7 +27,9 @@ import com.digitalbridge.annotation.CascadeSave;
 import com.digitalbridge.annotation.CascadeSaveList;
 
 /**
- * <p> AssetWrapper class. </p>
+ * <p>
+ * AssetWrapper class.
+ * </p>
  *
  * @author rajakolli
  * @version 1: 0
@@ -35,33 +37,56 @@ import com.digitalbridge.annotation.CascadeSaveList;
 @Document(collection = "assetwrapper")
 public class AssetWrapper {
 
-	@Id private String id;
+	@Id
+	private String id;
 
-	@NotNull private String orgAssetId;
+	@NotNull
+	private String orgAssetId;
 
-	@Field("aName") @Indexed(direction = IndexDirection.ASCENDING) @NotNull @Size(min = 2) private String assetName;
+	@Field("aName")
+	@Indexed(direction = IndexDirection.ASCENDING)
+	@NotNull
+	@Size(min = 2)
+	private String assetName;
 
-	@NotNull private String borough;
+	@NotNull
+	private String borough;
 
-	@NotNull private String cuisine;
+	@NotNull
+	private String cuisine;
 
-	@CascadeSave @DBRef private Address address;
+	@CascadeSave
+	@DBRef
+	private Address address;
 
-	@CascadeSaveList @DBRef private List<Notes> notes;
+	@CascadeSaveList
+	@DBRef
+	private List<Notes> notes;
 
-	@Version private Long version;
+	@Version
+	private Long version;
 
-	@CreatedBy private String createdBy;
+	@CreatedBy
+	private String createdBy;
 
-	@Temporal(TemporalType.TIMESTAMP) @DateTimeFormat(style = "M-") @CreatedDate private Date createdDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(style = "M-")
+	@CreatedDate
+	private Date createdDate;
 
-	@LastModifiedBy private String lastModifiedBy;
+	@LastModifiedBy
+	private String lastModifiedBy;
 
-	@Temporal(TemporalType.TIMESTAMP) @DateTimeFormat(
-			style = "M-") @LastModifiedDate @Field("lDate") private Date lastmodifiedDate;
+	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(style = "M-")
+	@LastModifiedDate
+	@Field("lDate")
+	private Date lastmodifiedDate;
 
 	/**
-	 * <p> Getter for the field <code>id</code>. </p>
+	 * <p>
+	 * Getter for the field <code>id</code>.
+	 * </p>
 	 *
 	 * @return a {@link java.lang.String} object.
 	 */
@@ -213,7 +238,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Getter for the field <code>version</code>.</p>
+	 * <p>
+	 * Getter for the field <code>version</code>.
+	 * </p>
 	 *
 	 * @return a {@link java.lang.Long} object.
 	 */
@@ -222,7 +249,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Setter for the field <code>version</code>.</p>
+	 * <p>
+	 * Setter for the field <code>version</code>.
+	 * </p>
 	 *
 	 * @param version a {@link java.lang.Long} object.
 	 */
@@ -231,7 +260,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Getter for the field <code>createdBy</code>.</p>
+	 * <p>
+	 * Getter for the field <code>createdBy</code>.
+	 * </p>
 	 *
 	 * @return a {@link java.lang.String} object.
 	 */
@@ -240,7 +271,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Setter for the field <code>createdBy</code>.</p>
+	 * <p>
+	 * Setter for the field <code>createdBy</code>.
+	 * </p>
 	 *
 	 * @param createdBy a {@link java.lang.String} object.
 	 */
@@ -249,7 +282,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Getter for the field <code>createdDate</code>.</p>
+	 * <p>
+	 * Getter for the field <code>createdDate</code>.
+	 * </p>
 	 *
 	 * @return a {@link java.util.Date} object.
 	 */
@@ -258,7 +293,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Setter for the field <code>createdDate</code>.</p>
+	 * <p>
+	 * Setter for the field <code>createdDate</code>.
+	 * </p>
 	 *
 	 * @param createdDate a {@link java.util.Date} object.
 	 */
@@ -267,7 +304,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Getter for the field <code>lastModifiedBy</code>.</p>
+	 * <p>
+	 * Getter for the field <code>lastModifiedBy</code>.
+	 * </p>
 	 *
 	 * @return a {@link java.lang.String} object.
 	 */
@@ -276,7 +315,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Setter for the field <code>lastModifiedBy</code>.</p>
+	 * <p>
+	 * Setter for the field <code>lastModifiedBy</code>.
+	 * </p>
 	 *
 	 * @param lastModifiedBy a {@link java.lang.String} object.
 	 */
@@ -285,7 +326,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Getter for the field <code>lastmodifiedDate</code>.</p>
+	 * <p>
+	 * Getter for the field <code>lastmodifiedDate</code>.
+	 * </p>
 	 *
 	 * @return a {@link java.util.Date} object.
 	 */
@@ -294,7 +337,9 @@ public class AssetWrapper {
 	}
 
 	/**
-	 * <p>Setter for the field <code>lastmodifiedDate</code>.</p>
+	 * <p>
+	 * Setter for the field <code>lastmodifiedDate</code>.
+	 * </p>
 	 *
 	 * @param lastmodifiedDate a {@link java.util.Date} object.
 	 */

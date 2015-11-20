@@ -20,9 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.digitalbridge.domain.Address;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 
-
 /**
- * <p>AddressService class.</p>
+ * <p>
+ * AddressService class.
+ * </p>
  *
  * @author rajakolli
  * @version 1:0
@@ -32,19 +33,23 @@ import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 public class AddressService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AddressService.class);
 
-	@Autowired AssetWrapperRepository assetWrapperRepository;
-	@Autowired MongoTemplate mongoTemplate;
+	@Autowired
+	AssetWrapperRepository assetWrapperRepository;
+	@Autowired
+	MongoTemplate mongoTemplate;
 
 	/**
-	 * <p>updateSetValue.</p>
+	 * <p>
+	 * updateSetValue.
+	 * </p>
 	 *
 	 * @param assetID a {@link java.lang.String} object.
 	 * @param value a {@link java.util.Map} object.
 	 * @return a {@link com.digitalbridge.domain.Address} object.
 	 */
 	@Secured({ "ROLE_USER" })
-	@RequestMapping(value = "/update/addressValue", method = { RequestMethod.GET, RequestMethod.PUT },
-      headers = "Accept=application/json")
+	@RequestMapping(value = "/update/addressValue", method = { RequestMethod.GET,
+			RequestMethod.PUT }, headers = "Accept=application/json")
 	public Address updateSetValue(String assetID, Map<String, Object> value) {
 		LOGGER.debug("received update request for assetID {}", assetID);
 		String addressID = assetWrapperRepository.findOne(assetID).getAddress().getId();
@@ -56,7 +61,7 @@ public class AddressService {
 		Address result = mongoTemplate.findAndModify(query, update,
 				new FindAndModifyOptions().returnNew(true).upsert(false), Address.class);
 		LOGGER.debug("Result : {}", result);
-		Assert.isTrue(result.getId().equalsIgnoreCase(addressID),"Address Matched");
+		Assert.isTrue(result.getId().equalsIgnoreCase(addressID), "Address Matched");
 		return result;
 	}
 }

@@ -18,20 +18,24 @@ import com.digitalbridge.domain.User;
 @PreAuthorize("hasRole('ROLE_USER')")
 public interface UserRepository extends MongoRepository<User, String> {
 
-  /**
-   * <p>findByUserName.</p>
-   *
-   * @param username a {@link java.lang.String} object.
-   * @return a {@link com.digitalbridge.domain.User} object.
-   */
-  User findByUserName(String username);
-  
-  /**
-   * <p>findByUserNameAndPassword.</p>
-   *
-   * @param username a {@link java.lang.String} object.
-   * @param object a {@link java.lang.Object} object.
-   * @return a {@link com.digitalbridge.domain.User} object.
-   */
-  User findByUserNameAndPassword(String username, Object object);
+	/**
+	 * <p>
+	 * findByUserName.
+	 * </p>
+	 *
+	 * @param username a {@link java.lang.String} object.
+	 * @return a {@link com.digitalbridge.domain.User} object.
+	 */
+	User findByUserName(String username);
+
+	/**
+	 * <p>
+	 * findByUserNameAndPassword.
+	 * </p>
+	 *
+	 * @param username a {@link java.lang.String} object.
+	 * @param object a {@link java.lang.Object} object.
+	 * @return a {@link com.digitalbridge.domain.User} object.
+	 */
+	User findByUserNameAndPassword(String username, Object object);
 }

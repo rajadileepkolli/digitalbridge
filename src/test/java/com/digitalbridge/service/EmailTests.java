@@ -7,11 +7,12 @@ import com.digitalbridge.DigitalBridgeApplicationTests;
 
 public class EmailTests extends DigitalBridgeApplicationTests {
 
-  @Autowired Email email;
+	@Autowired
+	Email email;
 
-  @Test
-  public final void testSendEmail() {
-    email.sendEmail("rajakolli@deloitte.com","Mail Sent Successfully !!");
-  }
+	@Test
+	public final void testSendEmail() {
+		email.sendEmail("rajakolli@deloitte.com", "Mail Sent Successfully !!");
+	}
 
 }

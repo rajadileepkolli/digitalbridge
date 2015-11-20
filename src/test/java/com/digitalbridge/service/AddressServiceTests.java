@@ -22,28 +22,29 @@ import com.mongodb.client.model.IndexOptions;
 
 public class AddressServiceTests extends DigitalBridgeApplicationTests {
 
-  @Test
-  public final void testUpdateSetValue() {
+	@Test
+	public final void testUpdateSetValue() {
 
-    SecurityUtils.runAs(USERNAME, PASSWORD, ROLE_USER);
-    Map<String, Object> value = new HashMap<String, Object>();
-    int random = new Random().nextInt(1000);
-    value.put("building", random);
-    Address address = addressService.updateSetValue(assetID, value);
-    assertTrue(address.getBuilding().equalsIgnoreCase(String.valueOf(random)));
-    Page<AssetWrapper> res = assetWrapperService.findByAddressIdIn(Arrays.asList(address.getId()), pageable);
-    assertEquals(assetID, res.getContent().get(0).getId());
+		SecurityUtils.runAs(USERNAME, PASSWORD, ROLE_USER);
+		Map<String, Object> value = new HashMap<String, Object>();
+		int random = new Random().nextInt(1000);
+		value.put("building", random);
+		Address address = addressService.updateSetValue(assetID, value);
+		assertTrue(address.getBuilding().equalsIgnoreCase(String.valueOf(random)));
+		Page<AssetWrapper> res = assetWrapperService
+				.findByAddressIdIn(Arrays.asList(address.getId()), pageable);
+		assertEquals(assetID, res.getContent().get(0).getId());
 
-  }
+	}
 
-  @Test
-  @Ignore
-  public void testCreateIndex() throws Exception {
-    MongoCollection<Document> collection = mongoClient.getDatabase("digitalbridge").getCollection("address",
-        Document.class);
-    Document bkey = Document.parse("{ \"location\": \"2dsphere\" }");
-    collection.dropIndexes();
-    collection.createIndex(bkey, new IndexOptions().name("geospatialIdx"));
-  }
+	@Test
+	@Ignore
+	public void testCreateIndex() throws Exception {
+		MongoCollection<Document> collection = mongoClient.getDatabase("digitalbridge")
+				.getCollection("address", Document.class);
+		Document bkey = Document.parse("{ \"location\": \"2dsphere\" }");
+		collection.dropIndexes();
+		collection.createIndex(bkey, new IndexOptions().name("geospatialIdx"));
+	}
 
 }

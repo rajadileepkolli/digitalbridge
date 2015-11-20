@@ -20,7 +20,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import com.digitalbridge.domain.AssetWrapper;
 
 /**
- * <p>AssetWrapperRepository interface.</p>
+ * <p>
+ * AssetWrapperRepository interface.
+ * </p>
  *
  * @author rajakolli
  * @version 1: 0
@@ -30,7 +32,9 @@ import com.digitalbridge.domain.AssetWrapper;
 public interface AssetWrapperRepository extends MongoRepository<AssetWrapper, String> {
 
 	/**
-	 * <p> findAll. </p>
+	 * <p>
+	 * findAll.
+	 * </p>
 	 *
 	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
 	 * @return a {@link org.springframework.data.domain.Page} object.
@@ -117,7 +121,8 @@ public interface AssetWrapperRepository extends MongoRepository<AssetWrapper, St
 	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
 	 * @return a {@link org.springframework.data.domain.Page} object.
 	 */
-	Page<AssetWrapper> queryFirst10ByAssetName(@Param("assetName") String assetName, Pageable pageable);
+	Page<AssetWrapper> queryFirst10ByAssetName(@Param("assetName") String assetName,
+			Pageable pageable);
 
 	/**
 	 * <p>
@@ -128,7 +133,8 @@ public interface AssetWrapperRepository extends MongoRepository<AssetWrapper, St
 	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
 	 * @return a {@link org.springframework.data.domain.Slice} object.
 	 */
-	Slice<AssetWrapper> findTop3ByAssetName(@Param("assetName") String assetName, Pageable pageable);
+	Slice<AssetWrapper> findTop3ByAssetName(@Param("assetName") String assetName,
+			Pageable pageable);
 
 	/**
 	 * <p>
@@ -139,10 +145,13 @@ public interface AssetWrapperRepository extends MongoRepository<AssetWrapper, St
 	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
 	 * @return a {@link org.springframework.data.domain.Page} object.
 	 */
-	Page<AssetWrapper> findByIdIn(@Param("assetIds") List<String> assetIds, Pageable pageable);
-	
+	Page<AssetWrapper> findByIdIn(@Param("assetIds") List<String> assetIds,
+			Pageable pageable);
+
 	/**
-	 * <p>findByAddressLocationNearAndIdIn.</p>
+	 * <p>
+	 * findByAddressLocationNearAndIdIn.
+	 * </p>
 	 *
 	 * @param point a {@link org.springframework.data.geo.Point} object.
 	 * @param distance a {@link org.springframework.data.geo.Distance} object.
@@ -150,16 +159,19 @@ public interface AssetWrapperRepository extends MongoRepository<AssetWrapper, St
 	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
 	 * @return a {@link org.springframework.data.domain.Page} object.
 	 */
-	Page<AssetWrapper> findByAddressLocationNearAndIdIn(@Param("point") Point point, @Param("distance") Distance distance,
+	Page<AssetWrapper> findByAddressLocationNearAndIdIn(@Param("point") Point point,
+			@Param("distance") Distance distance,
 			@Param("assetIds") List<String> assetIds, Pageable pageable);
-	
+
 	/**
-	 * <p>findByAddressIdIn.</p>
+	 * <p>
+	 * findByAddressIdIn.
+	 * </p>
 	 *
 	 * @param assetIds a {@link java.util.List} object.
 	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
 	 * @return a {@link org.springframework.data.domain.Page} object.
 	 */
 	Page<AssetWrapper> findByAddressIdIn(List<String> assetIds, Pageable pageable);
-	
+
 }

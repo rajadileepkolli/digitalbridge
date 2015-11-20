@@ -6,7 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * <p>CascadeSave class.</p>
+ * <p>
+ * CascadeSave class.
+ * </p>
  *
  * @author rajakolli
  * @version 1 : 0

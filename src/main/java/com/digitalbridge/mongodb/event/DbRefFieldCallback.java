@@ -6,7 +6,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.util.ReflectionUtils;
 
 /**
- * <p>DbRefFieldCallback class.</p>
+ * <p>
+ * DbRefFieldCallback class.
+ * </p>
  *
  * @author rajakolli
  * @version 1 : 0
@@ -16,7 +18,8 @@ public class DbRefFieldCallback implements ReflectionUtils.FieldCallback {
 	private boolean idFound;
 
 	/** {@inheritDoc} */
-	public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
+	public void doWith(Field field)
+			throws IllegalArgumentException, IllegalAccessException {
 		ReflectionUtils.makeAccessible(field);
 
 		if (field.isAnnotationPresent(Id.class)) {
@@ -25,7 +28,9 @@ public class DbRefFieldCallback implements ReflectionUtils.FieldCallback {
 	}
 
 	/**
-	 * <p>isIdFound.</p>
+	 * <p>
+	 * isIdFound.
+	 * </p>
 	 *
 	 * @return a boolean.
 	 */

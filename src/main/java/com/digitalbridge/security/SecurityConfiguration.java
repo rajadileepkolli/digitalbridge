@@ -16,32 +16,35 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import com.digitalbridge.util.Constants;
 
 /**
- * <p> SecurityConfiguration class. </p>
+ * <p>
+ * SecurityConfiguration class.
+ * </p>
  *
  * @author rajakolli
- * @version 1 : 1
+ * @version 1:2
  */
-// @EnableGlobalMethodSecurity(prePostEnabled = true)
 @Configuration
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-	@Autowired private MongoDBAuthenticationProvider authenticationProvider;
-  /**
-   * <p>
-   * configureGlobal.
-   * </p>
-   *
-   * @param auth a
-   *          {@link org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder}
-   *          object.
-   * @throws java.lang.Exception if any.
-   */
-  @Autowired
-  public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-    auth.authenticationProvider(authenticationProvider);
-  }
+	@Autowired
+	private MongoDBAuthenticationProvider authenticationProvider;
+
+	/**
+	 * <p>
+	 * configureGlobal.
+	 * </p>
+	 *
+	 * @param auth a
+	 * {@link org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder}
+	 * object.
+	 * @throws java.lang.Exception if any.
+	 */
+	@Autowired
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(authenticationProvider);
+	}
 
 	/** {@inheritDoc} */
 	@Override
@@ -54,25 +57,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * This section defines the user accounts which can be used for authentication as well as the roles each user has.
-   * @param http the {@link HttpSecurity} to modify
-   * @throws Exception if an error occurs
-   * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
-   */
+	 * This section defines the user accounts which can be used for authentication as well
+	 * as the roles each user has.
+	 * @param http the {@link HttpSecurity} to modify
+	 * @throws Exception if an error occurs
+	 * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
+	 */
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
 		AccessDeniedHandler accessDeniedHandler = new MyAccessDeniedHandler();
 
-		http.httpBasic()
-				.and().authorizeRequests()
-				.antMatchers(HttpMethod.GET,"/digitalbridge/search/getEncoded/**").permitAll()
-				.anyRequest().fullyAuthenticated()
-				.and().exceptionHandling().accessDeniedHandler(accessDeniedHandler)
-				.and().csrf().disable()
-				    .sessionManagement()
-				        .sessionCreationPolicy(SessionCreationPolicy.STATELESS).sessionFixation().newSession()
-				.and().headers().httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(Constants.MAXAGE);
+		http.httpBasic().and().authorizeRequests()
+				.antMatchers(HttpMethod.GET, "/digitalbridge/search/getEncoded/**")
+				.permitAll().anyRequest().fullyAuthenticated().and().exceptionHandling()
+				.accessDeniedHandler(accessDeniedHandler).and().csrf().disable()
+				.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).sessionFixation()
+				.newSession().and().headers().httpStrictTransportSecurity()
+				.includeSubDomains(true).maxAgeInSeconds(Constants.MAXAGE);
 	}
 
 }
