@@ -55,8 +55,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 	 * {@inheritDoc}
 	 *
 	 * This section defines the user accounts which can be used for authentication as well as the roles each user has.
-	 * @param http
-   * @throws Exception
+   * @param http the {@link HttpSecurity} to modify
+   * @throws Exception if an error occurs
    * @see org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter#configure(org.springframework.security.config.annotation.web.builders.HttpSecurity)
    */
 	@Override
