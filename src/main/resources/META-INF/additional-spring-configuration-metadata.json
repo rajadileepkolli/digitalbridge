@@ -1,0 +1,42 @@
+{"properties": [
+  {
+    "name": "mongo.primaryhost",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.primaryhost'"
+  },
+  {
+    "name": "mongo.primaryport",
+    "type": "java.lang.Integer",
+    "description": "A description for 'mongo.primaryport'"
+  },
+  {
+    "name": "mongo.secondaryhost",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.secondaryhost'"
+  },
+  {
+    "name": "mongo.secondaryport",
+    "type": "java.lang.Integer",
+    "description": "A description for 'mongo.secondaryport'"
+  },
+  {
+    "name": "mongo.teritoryhost",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.teritoryhost'"
+  },
+  {
+    "name": "mongo.teritoryport",
+    "type": "java.lang.Integer",
+    "description": "A description for 'mongo.teritoryport'"
+  },
+  {
+    "name": "mongo.replicasetname",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.replicasetname'"
+  },
+  {
+    "name": "mongo.superadminpassword",
+    "type": "java.lang.String",
+    "description": "A description for 'mongo.superadminpassword'"
+  }
+]}
