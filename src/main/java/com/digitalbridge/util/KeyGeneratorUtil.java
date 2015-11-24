@@ -20,6 +20,9 @@ import org.springframework.security.crypto.keygen.KeyGenerators;
 import org.springframework.security.crypto.keygen.StringKeyGenerator;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 
+import com.digitalbridge.exception.DigitalBridgeException;
+import com.digitalbridge.exception.DigitalBridgeExceptionBean;
+
 /**
  * <p>
  * KeyGeneratorUtil class.
@@ -30,6 +33,9 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
  */
 public class KeyGeneratorUtil {
 
+	// Authenticate and Authorize Mongodb
+	// https://github.com/ihr/spring-boot-mongodb
+	// http://ryanjbaxter.com/2015/01/06/securing-rest-apis-with-spring-boot/
 	private static final Logger LOGGER = LoggerFactory.getLogger(KeyGeneratorUtil.class);
 
 	private static final String KEY_GENERATOR = "ba189daec8f83047";
@@ -67,21 +73,54 @@ public class KeyGeneratorUtil {
 	 *
 	 * @param plainText a {@link java.lang.String} object.
 	 * @return a {@link java.lang.String} object.
-	 * @throws java.security.NoSuchAlgorithmException if any.
-	 * @throws javax.crypto.NoSuchPaddingException if any.
-	 * @throws java.security.InvalidKeyException if any.
-	 * @throws javax.crypto.IllegalBlockSizeException if any.
-	 * @throws javax.crypto.BadPaddingException if any.
+	 * @throws DigitalBridgeException if any
 	 */
-	public static String encrypt(String plainText)
-			throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException,
-			IllegalBlockSizeException, BadPaddingException {
+	public static String encrypt(String plainText) throws DigitalBridgeException {
 		Key aesKey = new SecretKeySpec(KEY_GENERATOR.getBytes(), "AES");
-		Cipher cipher = Cipher.getInstance("AES");
-		byte[] plainTextByte = plainText.getBytes();
-		cipher.init(Cipher.ENCRYPT_MODE, aesKey);
-		byte[] encryptedByte = cipher.doFinal(plainTextByte);
-		byte[] encoder = Base64.encodeBase64(encryptedByte);
+		Cipher cipher;
+		byte[] encoder = null;
+		try {
+			cipher = Cipher.getInstance("AES");
+			byte[] plainTextByte = plainText.getBytes();
+			cipher.init(Cipher.ENCRYPT_MODE, aesKey);
+			byte[] encryptedByte = cipher.doFinal(plainTextByte);
+			encoder = Base64.encodeBase64(encryptedByte);
+		}
+		catch (NoSuchAlgorithmException e) {
+			LOGGER.error("Exception ::{}", e.getMessage(), e);
+			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
+			bean.setFaultCode("1102");
+			bean.setFaultString("NoSuchAlgorithmException");
+			throw new DigitalBridgeException(bean);
+		}
+		catch (NoSuchPaddingException e) {
+			LOGGER.error("Exception ::{}", e.getMessage(), e);
+			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
+			bean.setFaultCode("1103");
+			bean.setFaultString("NoSuchPaddingException");
+			throw new DigitalBridgeException(bean);
+		}
+		catch (InvalidKeyException e) {
+			LOGGER.error("Exception ::{}", e.getMessage(), e);
+			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
+			bean.setFaultCode("1103");
+			bean.setFaultString("InvalidKeyException");
+			throw new DigitalBridgeException(bean);
+		}
+		catch (IllegalBlockSizeException e) {
+			LOGGER.error("Exception ::{}", e.getMessage(), e);
+			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
+			bean.setFaultCode("1105");
+			bean.setFaultString("IllegalBlockSizeException");
+			throw new DigitalBridgeException(bean);
+		}
+		catch (BadPaddingException e) {
+			LOGGER.error("Exception ::{}", e.getMessage(), e);
+			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
+			bean.setFaultCode("1106");
+			bean.setFaultString("BadPaddingException");
+			throw new DigitalBridgeException(bean);
+		}
 		return new String(encoder);
 	}
 

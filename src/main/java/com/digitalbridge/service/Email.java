@@ -4,10 +4,15 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.digitalbridge.exception.DigitalBridgeException;
+import com.digitalbridge.exception.DigitalBridgeExceptionBean;
 
 @RestController
 /**
@@ -20,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 public class Email {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(Email.class);
+
 	@Autowired
 	JavaMailSender javaMailSender;
 
@@ -30,8 +37,9 @@ public class Email {
 	 *
 	 * @param to a {@link java.lang.String} object.
 	 * @param text a {@link java.lang.String} object.
+	 * @throws com.digitalbridge.exception.DigitalBridgeException if any.
 	 */
-	public void sendEmail(String to, String text) {
+	public void sendEmail(String to, String text) throws DigitalBridgeException {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 		try {
@@ -41,8 +49,11 @@ public class Email {
 			javaMailSender.send(mimeMessage);
 		}
 		catch (MessagingException e) {
-			e.printStackTrace();
+			LOGGER.error("MessagingException :: {}", e.getMessage(), e);
+			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
+			bean.setFaultCode("1101");
+			bean.setFaultString("MessagingException");
+			throw new DigitalBridgeException(bean);
 		}
-
 	}
 }

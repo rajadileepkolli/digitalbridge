@@ -18,8 +18,7 @@ public class DbRefFieldCallback implements ReflectionUtils.FieldCallback {
 	private boolean idFound;
 
 	/** {@inheritDoc} */
-	public void doWith(Field field)
-			throws IllegalArgumentException, IllegalAccessException {
+	public void doWith(Field field) throws IllegalAccessException {
 		ReflectionUtils.makeAccessible(field);
 
 		if (field.isAnnotationPresent(Id.class)) {

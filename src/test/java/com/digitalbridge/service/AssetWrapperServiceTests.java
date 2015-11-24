@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.junit.Test;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.digitalbridge.DigitalBridgeApplicationTests;
 import com.digitalbridge.domain.AssetWrapper;
@@ -53,7 +52,6 @@ public class AssetWrapperServiceTests extends DigitalBridgeApplicationTests {
 		Notes notes = new Notes("R", new Date(1441712050500l), 21);
 		notesRepository.save(notes);
 		value.put("notes", notes);
-		SecurityUtils.runAs("system", "system", "ROLE_USER");
 		AssetWrapper assetWrapper = assetWrapperRepository.findOne(assetID);
 		int originalCount = assetWrapper.getNotes().size();
 		AssetWrapper restaurants = assetWrapperService.addToFieldArray(assetID, value);
@@ -61,7 +59,6 @@ public class AssetWrapperServiceTests extends DigitalBridgeApplicationTests {
 		assertEquals(assetWrapperRepository.findOne(assetID).getNotes().size(),
 				originalCount + 1);
 		assetWrapperService.removeFromFieldArray(assetID, value);
-		SecurityContextHolder.clearContext();
 		assertEquals(assetWrapperRepository.findOne(assetID).getNotes().size(),
 				originalCount);
 	}

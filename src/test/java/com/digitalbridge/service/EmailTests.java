@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.digitalbridge.DigitalBridgeApplicationTests;
+import com.digitalbridge.exception.DigitalBridgeException;
 
 public class EmailTests extends DigitalBridgeApplicationTests {
 
@@ -11,7 +12,7 @@ public class EmailTests extends DigitalBridgeApplicationTests {
 	Email email;
 
 	@Test
-	public final void testSendEmail() {
+	public final void testSendEmail() throws DigitalBridgeException {
 		email.sendEmail("rajakolli@deloitte.com", "Mail Sent Successfully !!");
 	}
 

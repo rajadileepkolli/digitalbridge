@@ -43,7 +43,7 @@ public class CascadeCallback implements FieldCallback {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void doWith(Field field)
-			throws IllegalArgumentException, IllegalAccessException {
+			throws IllegalAccessException {
 		ReflectionUtils.makeAccessible(field);
 
 		if (field.isAnnotationPresent(DBRef.class)

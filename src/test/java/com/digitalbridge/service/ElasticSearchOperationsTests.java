@@ -157,7 +157,7 @@ public class ElasticSearchOperationsTests extends DigitalBridgeApplicationTests 
 	@Test
 	public final void testDropIndexes() throws DigitalBridgeException {
 		SecurityUtils.runAs(USERNAME, PASSWORD, ROLE_ADMIN);
-		JestResult res = elasticSearchOperations.createIndexes(USERNAME, null);
+		JestResult res = elasticSearchOperations.createIndexes(USERNAME);
 		if (res.isSucceeded()) {
 			DocumentResult response = elasticSearchOperations.dropIndexes(USERNAME, null);
 			assertNotNull(response);

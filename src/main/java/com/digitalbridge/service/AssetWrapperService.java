@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -70,7 +71,7 @@ public class AssetWrapperService {
 	 * @return a {@link org.springframework.data.domain.Page} object.
 	 */
 	@Secured({ "ROLE_USER" })
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public Page<AssetWrapper> getAll() {
 		return assetWrapperRepository
 				.findAll(new PageRequest(Constants.ZERO, Constants.PAGESIZE));

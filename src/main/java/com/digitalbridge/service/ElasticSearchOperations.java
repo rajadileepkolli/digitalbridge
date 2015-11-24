@@ -166,16 +166,17 @@ public class ElasticSearchOperations {
 			if ("java.net.ConnectException: Connection refused: connect"
 					.equalsIgnoreCase(e.getCause().toString())) {
 				LOGGER.error("IOException occured while attempting to search {}",
-						e.getMessage());
+						e.getMessage(), e);
 				DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
 				bean.setFaultCode("1004");
 				bean.setFaultString("IOError");
-				throw new DigitalBridgeException(bean);
 				// TODO Send Email
+				throw new DigitalBridgeException(bean);
+
 			}
 			if (e.getMessage().toString().contains("Read timed out")) {
 				LOGGER.error("IOException occured while attempting to search {}",
-						e.getMessage());
+						e.getMessage(), e);
 				DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
 				bean.setFaultCode("1005");
 				bean.setFaultString("IOerror");
@@ -202,14 +203,13 @@ public class ElasticSearchOperations {
 	 * @throws com.digitalbridge.exception.DigitalBridgeException if any.
 	 * @param termFilters a {@link java.util.Map} object.
 	 * @param refresh a boolean.
-	 * @throws java.io.IOException if any.
 	 */
 	@Secured({ "ROLE_USER" })
 	@RequestMapping(value = "/termFacetSearch", method = { RequestMethod.POST,
 			RequestMethod.GET })
 	public Map<String, Map<String, Long>> termFacetSearch(
 			Map<String, Object[]> termFilters, boolean refresh)
-					throws DigitalBridgeException, IOException {
+					throws DigitalBridgeException {
 
 		SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 		QueryBuilder queryBuilder = QueryBuilders.boolQuery()
@@ -385,11 +385,11 @@ public class ElasticSearchOperations {
 		catch (JsonSyntaxException e) {
 			LOGGER.error(
 					"JsonSyntaxException occured while attempting to create GeoPointMapping",
-					e.getMessage());
+					e.getMessage(), e);
 		}
 		catch (Exception e) {
 			LOGGER.error("Exception occured while attempting to create GeoPointMapping",
-					e.getMessage());
+					e.getMessage(), e);
 		}
 	}
 
@@ -399,17 +399,16 @@ public class ElasticSearchOperations {
 	 * </p>
 	 *
 	 * @param indexName a {@link java.lang.String} object.
-	 * @param type a {@link java.lang.String} object.
 	 * @return a {@link io.searchbox.client.JestResult} object.
 	 * @throws com.digitalbridge.exception.DigitalBridgeException if any.
 	 */
 	@Secured({ "ROLE_ADMIN" })
-	@RequestMapping(value = "/createIndexes/{indexName}/{type}")
-	public JestResult createIndexes(@PathVariable("indexName") String indexName,
-			@PathVariable("type") String type) throws DigitalBridgeException {
+	@RequestMapping(value = "/createIndexes/{indexName}")
+	public JestResult createIndexes(@PathVariable("indexName") String indexName)
+			throws DigitalBridgeException {
 		Settings.Builder settingsBuilder = Settings.settingsBuilder();
-		settingsBuilder.put("number_of_shards", 5);
-		settingsBuilder.put("number_of_replicas", 1);
+		settingsBuilder.put("number_of_shards", Constants.FIVE);
+		settingsBuilder.put("number_of_replicas", Constants.ONE);
 		CreateIndex indexBuilder = new CreateIndex.Builder(indexName.toLowerCase())
 				.setHeader(getHeader()).settings(settingsBuilder.build().getAsMap())
 				.build();
@@ -445,7 +444,7 @@ public class ElasticSearchOperations {
 			LOGGER.info(res.getJsonString());
 		}
 		catch (IOException e) {
-			LOGGER.error("unable to delete Indexes ", e.getMessage());
+			LOGGER.error("unable to delete Indexes ", e.getMessage(), e);
 			DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
 			bean.setFaultCode("1007");
 			bean.setFaultString("Unable to Delete");
@@ -582,19 +581,19 @@ public class ElasticSearchOperations {
 				// we are transforming the source, before adding it to the bulk
 				// index queue
 				for (Entry<String, JsonElement> sourceElement : source.entrySet()) {
-					if (sourceElement.getKey().equals("address")) {
+					if ("address".equals(sourceElement.getKey())) {
 						JsonObject addressValues = sourceElement.getValue()
 								.getAsJsonObject();
 						for (Entry<String, JsonElement> addressElement : addressValues
 								.entrySet()) {
-							if (addressElement.getKey().equalsIgnoreCase("location")) {
+							if ("location".equalsIgnoreCase(addressElement.getKey())) {
 								String lat = null, lon = null;
 								JsonObject locationValues = addressElement.getValue()
 										.getAsJsonObject();
 								for (Entry<String, JsonElement> locationElement : locationValues
 										.entrySet()) {
-									if (locationElement.getKey()
-											.equalsIgnoreCase("coordinates")) {
+									if ("coordinates"
+											.equalsIgnoreCase(locationElement.getKey())) {
 										String loccoord = locationElement.getValue()
 												.toString().replace("[", "")
 												.replace("]", "");
@@ -670,7 +669,7 @@ public class ElasticSearchOperations {
 		catch (IOException e) {
 			LOGGER.error(
 					"IOException occured while attempting to perform ElasticSearch Operation : {}",
-					e.getMessage());
+					e.getMessage(), e);
 		}
 		return jestResult;
 	}
