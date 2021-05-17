@@ -50,13 +50,6 @@ public class AssetWrapperService {
 	@Autowired
 	MongoTemplate mongoTemplate;
 
-	/**
-	 * <p>
-	 * getAll.
-	 * </p>
-	 *
-	 * @return a {@link org.springframework.data.domain.Page} object.
-	 */
 	@Secured({ "ROLE_USER" })
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public Page<AssetWrapper> getAll() {

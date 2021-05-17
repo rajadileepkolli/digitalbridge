@@ -90,7 +90,7 @@ public class MongoDevUtilService {
 		final MongoDatabase database = mongoClient.getDatabase("test");
 		MongoCollection<Document> collection = database.getCollection("restaurants",
 				Document.class);
-		List<Document> res = collection.find().into(new ArrayList<Document>());
+		List<Document> res = collection.find().into(new ArrayList<>());
 
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();

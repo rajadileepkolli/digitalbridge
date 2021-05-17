@@ -1,5 +1,6 @@
 package com.digitalbridge;
 
+import com.digitalbridge.config.MongoDbContainer;
 import com.digitalbridge.mongodb.repository.AddressRepository;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 import com.digitalbridge.mongodb.repository.NotesRepository;
@@ -19,9 +20,7 @@ import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -30,12 +29,10 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 
-@SpringBootTest(classes = DigitalBridgeApplication.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
-@WebAppConfiguration
-@ActiveProfiles("local")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public abstract class DigitalBridgeApplicationTests {
+public abstract class DigitalBridgeApplicationTests extends MongoDbContainer {
 
 	protected static final String assetID = "56094694bd51636546272ee8";
 	protected static final String USERNAME = "JUNIT_TEST";
@@ -79,7 +76,7 @@ public abstract class DigitalBridgeApplicationTests {
 	}
 
 	@AfterAll
-	public void tearDown() throws Exception {
+	public void tearDown() {
 		SecurityContextHolder.clearContext();
 	}
 

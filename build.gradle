@@ -15,6 +15,7 @@ repositories {
 
 ext {
 	set('snippetsDir', file("build/generated-snippets"))
+	set('testcontainersVersion', "1.15.3")
 }
 
 dependencies {
@@ -32,9 +33,16 @@ dependencies {
 	implementation 'io.searchbox:jest:6.3.1'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:mongodb'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+	}
 }
 
 test {

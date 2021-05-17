@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
@@ -75,16 +76,25 @@ public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
 		return List.of("com.digitalbridge.domain");
 	}
 
+
 	@Bean
+	@Profile(value = {"!prod"})
+	@Override
 	public MongoClient mongoClient() {
+		return MongoClients.create(mongoClientSettings());
+	}
+
+	@Bean
+	@Profile(value = {"prod"})
+	public MongoClient prodMongoClient() {
 
 		ServerAddress primary = new ServerAddress(
 				new InetSocketAddress(primaryhost, primaryport));
 		ServerAddress secondary = new ServerAddress(
 				new InetSocketAddress(secondaryhost, secondaryport));
-		ServerAddress teritory = new ServerAddress(
+		ServerAddress tertiary = new ServerAddress(
 				new InetSocketAddress(teritoryhost, teritoryport));
-		List<ServerAddress> seeds = List.of(primary, secondary, teritory);
+		List<ServerAddress> seeds = List.of(primary, secondary, tertiary);
 
 		MongoCredential credential = MongoCredential.createCredential("digitalbridgeAdmin",
 				DATABASE, superadminpassword.toCharArray());

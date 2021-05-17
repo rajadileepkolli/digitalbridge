@@ -20,14 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.digitalbridge.domain.Address;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 
-/**
- * <p>
- * AddressService class.
- * </p>
- *
- * @author rajakolli
- * @version 1:0
- */
 @RestController
 @RequestMapping(value = "/assetwrapper/search")
 public class AddressService {
@@ -38,15 +30,6 @@ public class AddressService {
 	@Autowired
 	MongoTemplate mongoTemplate;
 
-	/**
-	 * <p>
-	 * updateSetValue.
-	 * </p>
-	 *
-	 * @param assetID a {@link java.lang.String} object.
-	 * @param value a {@link java.util.Map} object.
-	 * @return a {@link com.digitalbridge.domain.Address} object.
-	 */
 	@Secured({ "ROLE_USER" })
 	@RequestMapping(value = "/update/addressValue", method = { RequestMethod.GET,
 			RequestMethod.PUT }, headers = "Accept=application/json")

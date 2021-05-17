@@ -9,7 +9,6 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 @EnableSpringDataWebSupport
 public class DigitalBridgeApplication {
 
-
 	public static void main(String[] args) {
 		SpringApplication.run(DigitalBridgeApplication.class, args);
 	}
