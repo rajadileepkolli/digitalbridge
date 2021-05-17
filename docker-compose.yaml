@@ -1,0 +1,82 @@
+version: '3.7'
+
+services:
+
+  # Elasticsearch Docker Images: https://www.docker.elastic.co/
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+      - 9300:9300
+
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.4.0
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
+
+  mongo1:
+    image: mongo:latest
+    container_name: mongo1
+    env_file:
+      - .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_INITDB_DATABASE}
+      MONGO_REPLICA_SET_NAME: ${MONGO_REPLICA_SET_NAME}
+    command: ["/usr/bin/mongod", "--auth", "--keyFile", "/etc/mongod-keyfile", "--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all", "--port", "27017" ]
+    volumes:
+      - ./data/mongo-1:/data/db
+      - ./docker/mongo/etc/mongod-keyfile:/etc/mongod-keyfile:ro # Permission: 400
+      - ./docker/set-credentials.sh:/docker-entrypoint-initdb.d/set-credentials.sh
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: test $$(echo "rs.initiate({_id:'digitalBridgeReplica',members:[{_id:0,host:\"mongo1:27017\"},{_id:1,host:\"mongo2:27018\"},{_id:2,host:\"mongo3:27019\"}]}).ok || rs.status().ok" | mongo --port 27017 --authenticationDatabase "admin" -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --quiet) -eq 1
+      interval: 10s
+      start_period: 30s
+
+  mongo2:
+    image: mongo:latest
+    container_name: mongo2
+    command: ["/usr/bin/mongod", "--auth", "--keyFile", "/etc/mongod-keyfile", "--replSet", "digitalBridgeReplica", "--bind_ip_all", "--port", "27018" ]
+    volumes:
+      - ./data/mongo-2:/data/db
+      - ./docker/mongo/etc/mongod-keyfile:/etc/mongod-keyfile:ro # Permission: 400
+    ports:
+      - 27018:27017
+
+  mongo3:
+    image: mongo:latest
+    container_name: mongo3
+    command: ["/usr/bin/mongod", "--auth", "--keyFile", "/etc/mongod-keyfile", "--replSet", "digitalBridgeReplica", "--bind_ip_all", "--port", "27019" ]
+    volumes:
+      - ./data/mongo-3:/data/db
+      - ./docker/mongo/etc/mongod-keyfile:/etc/mongod-keyfile:ro # Permission: 400
+    ports:
+      - 27019:27017
+
+
+volumes:
+  elasticsearch-data:
+    driver: local

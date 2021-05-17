@@ -1,16 +1,11 @@
 package com.digitalbridge.service;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import org.bson.Document;
-import org.junit.Ignore;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.springframework.data.domain.Page;
 
 import com.digitalbridge.DigitalBridgeApplicationTests;
@@ -19,6 +14,8 @@ import com.digitalbridge.domain.AssetWrapper;
 import com.digitalbridge.security.SecurityUtils;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.IndexOptions;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AddressServiceTests extends DigitalBridgeApplicationTests {
 
@@ -30,15 +27,15 @@ public class AddressServiceTests extends DigitalBridgeApplicationTests {
 		int random = new Random().nextInt(1000);
 		value.put("building", random);
 		Address address = addressService.updateSetValue(assetID, value);
-		assertTrue(address.getBuilding().equalsIgnoreCase(String.valueOf(random)));
+		assertThat(address.getBuilding()).isEqualToIgnoringCase(String.valueOf(random));
 		Page<AssetWrapper> res = assetWrapperService
-				.findByAddressIdIn(Arrays.asList(address.getId()), pageable);
-		assertEquals(assetID, res.getContent().get(0).getId());
+				.findByAddressIdIn(Collections.singletonList(address.getId()), pageable);
+		assertThat(assetID).isEqualTo(res.getContent().get(0).getId());
 
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void testCreateIndex() throws Exception {
 		MongoCollection<Document> collection = mongoClient.getDatabase("digitalbridge")
 				.getCollection("address", Document.class);

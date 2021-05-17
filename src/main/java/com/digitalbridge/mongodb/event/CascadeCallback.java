@@ -3,7 +3,7 @@ package com.digitalbridge.mongodb.event;
 import java.lang.reflect.Field;
 import java.util.List;
 
-import org.springframework.data.mapping.model.MappingException;
+import org.springframework.data.mapping.MappingException;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.util.ReflectionUtils;

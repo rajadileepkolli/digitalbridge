@@ -6,7 +6,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,20 +14,15 @@ import com.digitalbridge.exception.DigitalBridgeException;
 import com.digitalbridge.exception.DigitalBridgeExceptionBean;
 
 @RestController
-/**
- * <p>
- * Email class.
- * </p>
- *
- * @author rajakolli
- * @version 1:0
- */
 public class Email {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Email.class);
 
-	@Autowired
-	JavaMailSender javaMailSender;
+	private final JavaMailSender javaMailSender;
+
+	public Email(JavaMailSender javaMailSender) {
+		this.javaMailSender = javaMailSender;
+	}
 
 	/**
 	 * <p>

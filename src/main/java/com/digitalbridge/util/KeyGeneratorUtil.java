@@ -23,14 +23,6 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import com.digitalbridge.exception.DigitalBridgeException;
 import com.digitalbridge.exception.DigitalBridgeExceptionBean;
 
-/**
- * <p>
- * KeyGeneratorUtil class.
- * </p>
- *
- * @author rajakolli
- * @version 1 : 0
- */
 public class KeyGeneratorUtil {
 
 	// Authenticate and Authorize Mongodb
