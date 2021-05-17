@@ -20,10 +20,7 @@ import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoExceptionTranslator;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.CustomConversions;
-import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
-import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.*;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import com.digitalbridge.mongodb.audit.MongoAuditorProvider;
@@ -32,14 +29,6 @@ import com.digitalbridge.mongodb.event.CascadeSaveMongoEventListener;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
-/**
- * <p>
- * MongoDBConfiguration class.
- * </p>
- *
- * @author rajakolli
- * @version 1:0
- */
 @Configuration(proxyBeanMethods = false)
 public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
 
@@ -111,31 +100,6 @@ public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
 	}
 
 	@Bean
-	public MongoDatabaseFactory mongoDbFactory() {
-		return new SimpleMongoClientDatabaseFactory(mongoClient(), getDatabaseName());
-	}
-
-	/**
-	 * <p>
-	 * mongoTemplate.
-	 * </p>
-	 *
-	 * @return a {@link org.springframework.data.mongodb.core.MongoTemplate} object.
-	 */
-	@Bean
-	public MongoTemplate mongoTemplate() {
-		return new MongoTemplate(mongoDbFactory(), mongoConverter());
-	}
-
-	/**
-	 * <p>
-	 * mongoConverter.
-	 * </p>
-	 *
-	 * @return a
-	 * {@link org.springframework.data.mongodb.core.convert.MappingMongoConverter} object.
-	 */
-	@Bean
 	public MappingMongoConverter mongoConverter() {
 		MongoMappingContext mappingContext = new MongoMappingContext();
 		mappingContext.setAutoIndexCreation(true);
@@ -150,45 +114,23 @@ public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
 	/** {@inheritDoc} */
 	@Override
 	@Bean
-	public CustomConversions customConversions() {
-		List<Converter<?, ?>> converters = new ArrayList<Converter<?, ?>>();
-		converters.addAll(ObjectConverters.getConvertersToRegister());
-		return new CustomConversions(converters);
+	public MongoCustomConversions customConversions() {
+		List<Converter<?, ?>> converters = new ArrayList<>(ObjectConverters.getConvertersToRegister());
+		return new MongoCustomConversions(converters);
 	}
 
-	/**
-	 * <p>
-	 * exceptionTranslator.
-	 * </p>
-	 *
-	 * @return a {@link org.springframework.data.mongodb.core.MongoExceptionTranslator}
-	 * object.
-	 */
 	@Bean
 	public MongoExceptionTranslator exceptionTranslator() {
 		return new MongoExceptionTranslator();
 	}
 
-	/**
-	 * <p>
-	 * auditorProvider.
-	 * </p>
-	 *
-	 * @return a {@link org.springframework.data.domain.AuditorAware} object.
-	 */
+
 	@Bean
 	public AuditorAware<String> auditorProvider() {
 		return new MongoAuditorProvider<String>();
 	}
 
-	/**
-	 * <p>
-	 * cascadingMongoEventListener.
-	 * </p>
-	 *
-	 * @return a {@link com.digitalbridge.mongodb.event.CascadeSaveMongoEventListener}
-	 * object.
-	 */
+
 	@Bean
 	public CascadeSaveMongoEventListener cascadingMongoEventListener() {
 		return new CascadeSaveMongoEventListener();

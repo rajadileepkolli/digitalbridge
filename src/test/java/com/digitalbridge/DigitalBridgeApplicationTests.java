@@ -9,6 +9,7 @@ import com.digitalbridge.service.AssetWrapperService;
 import com.mongodb.client.MongoClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,6 +34,7 @@ import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 @ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
 @WebAppConfiguration
 @ActiveProfiles("local")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class DigitalBridgeApplicationTests {
 
 	protected static final String assetID = "56094694bd51636546272ee8";
