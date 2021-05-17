@@ -1,6 +1,7 @@
 package com.digitalbridge.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -63,7 +64,7 @@ public class ElasticSearchConfiguration {
 	 * @return a {@link java.util.List} object.
 	 */
 	public List<String> localConnectionURL() {
-		return Arrays.asList("http://127.0.0.1:9200");
+		return Collections.singletonList("http://127.0.0.1:9200");
 	}
 
 	/**

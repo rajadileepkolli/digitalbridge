@@ -5,16 +5,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.connection.ClusterConnectionMode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.MongoDbFactory;
-import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
+import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoExceptionTranslator;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
@@ -24,9 +29,6 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import com.digitalbridge.mongodb.audit.MongoAuditorProvider;
 import com.digitalbridge.mongodb.convert.ObjectConverters;
 import com.digitalbridge.mongodb.event.CascadeSaveMongoEventListener;
-import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
@@ -38,8 +40,8 @@ import com.mongodb.ServerAddress;
  * @author rajakolli
  * @version 1:0
  */
-@Configuration
-public class MongoDBConfiguration extends AbstractMongoConfiguration {
+@Configuration(proxyBeanMethods = false)
+public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
 
 	private static final String DATABASE = "digitalbridge";
 
@@ -73,51 +75,44 @@ public class MongoDBConfiguration extends AbstractMongoConfiguration {
 		return DATABASE;
 	}
 
-	/** {@inheritDoc} */
 	@Override
-	public Mongo mongo() throws Exception {
-		return null;
+	protected boolean autoIndexCreation() {
+		return true;
 	}
+
 
 	/** {@inheritDoc} */
 	@Override
-	protected String getMappingBasePackage() {
-		return "com.digitalbridge.domain";
+	protected List<String> getMappingBasePackages() {
+		return List.of("com.digitalbridge.domain");
 	}
 
-	/**
-	 * <p>
-	 * mongoClient.
-	 * </p>
-	 *
-	 * @return a {@link com.mongodb.MongoClient} object.
-	 */
 	@Bean
 	public MongoClient mongoClient() {
-		List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
-		credentialsList.add(MongoCredential.createCredential("digitalbridgeAdmin",
-				DATABASE, superadminpassword.toCharArray()));
+
 		ServerAddress primary = new ServerAddress(
 				new InetSocketAddress(primaryhost, primaryport));
 		ServerAddress secondary = new ServerAddress(
 				new InetSocketAddress(secondaryhost, secondaryport));
 		ServerAddress teritory = new ServerAddress(
 				new InetSocketAddress(teritoryhost, teritoryport));
-		List<ServerAddress> seeds = Arrays.asList(primary, secondary, teritory);
-		MongoClientOptions mongoClientOptions = MongoClientOptions.builder()
-				.requiredReplicaSetName(replicasetName).build();
-		return new MongoClient(seeds, credentialsList, mongoClientOptions);
+		List<ServerAddress> seeds = List.of(primary, secondary, teritory);
+
+		MongoCredential credential = MongoCredential.createCredential("digitalbridgeAdmin",
+				DATABASE, superadminpassword.toCharArray());
+
+		return MongoClients.create(
+				MongoClientSettings.builder()
+						.credential(credential)
+						.applyToClusterSettings(builder ->
+								builder.mode(ClusterConnectionMode.MULTIPLE).hosts(seeds)
+										.requiredReplicaSetName(replicasetName))
+						.build());
 	}
 
-	/**
-	 * <p>
-	 * mongoDbFactory.
-	 * </p>
-	 *
-	 * @return a {@link org.springframework.data.mongodb.MongoDbFactory} object.
-	 */
-	public MongoDbFactory mongoDbFactory() {
-		return new SimpleMongoDbFactory(mongoClient(), getDatabaseName());
+	@Bean
+	public MongoDatabaseFactory mongoDbFactory() {
+		return new SimpleMongoClientDatabaseFactory(mongoClient(), getDatabaseName());
 	}
 
 	/**
@@ -143,6 +138,7 @@ public class MongoDBConfiguration extends AbstractMongoConfiguration {
 	@Bean
 	public MappingMongoConverter mongoConverter() {
 		MongoMappingContext mappingContext = new MongoMappingContext();
+		mappingContext.setAutoIndexCreation(true);
 		DefaultDbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory());
 		MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver,
 				mappingContext);

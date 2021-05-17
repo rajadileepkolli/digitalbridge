@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.mongodb.client.MongoCollection;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,6 @@ import com.digitalbridge.mongodb.repository.AddressRepository;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 import com.digitalbridge.util.Constants;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 
@@ -74,7 +75,7 @@ public class AssetWrapperService {
 	@RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public Page<AssetWrapper> getAll() {
 		return assetWrapperRepository
-				.findAll(new PageRequest(Constants.ZERO, Constants.PAGESIZE));
+				.findAll(PageRequest.of(Constants.ZERO, Constants.PAGESIZE));
 	}
 
 	/**
@@ -89,7 +90,7 @@ public class AssetWrapperService {
 	public Page<AssetWrapper> geospatialsearch() {
 		Point point = new Point(-74.0014541, 40.7408231);
 		Distance distance = new Distance(1, Metrics.MILES);
-		Pageable pageable = new PageRequest(Constants.ZERO, Constants.PAGESIZE);
+		Pageable pageable = PageRequest.of(Constants.ZERO, Constants.PAGESIZE);
 		List<Address> result = addressRepository.findByLocationNear(point, distance,
 				pageable);
 		List<String> addressIds = new ArrayList<String>(result.size());
@@ -182,24 +183,19 @@ public class AssetWrapperService {
 		return result;
 	}
 
-	/**
-	 * <p>
-	 * createGeoSpatialIndex.
-	 * </p>
-	 */
-	@Secured({ "ROLE_ADMIN" })
-	@RequestMapping(value = "/createGeoSpatialIndex")
-	public void createGeoSpatialIndex() {
-		DBCollection collection = mongoTemplate.getCollection("address");
-		DBObject key = new BasicDBObject("location", "2dsphere");
-		collection.dropIndexes();
-		try {
-			collection.createIndex(key, "geospatialIdx");
-		}
-		catch (MongoException e) {
-			LOGGER.error("MongoException :: {}", e.getMessage(), e);
-		}
-	}
+//	@Secured({ "ROLE_ADMIN" })
+//	@RequestMapping(value = "/createGeoSpatialIndex")
+//	public void createGeoSpatialIndex() {
+//		MongoCollection<Document> collection = mongoTemplate.getCollection("address");
+//		DBObject key = new BasicDBObject("location", "2dsphere");
+//		collection.dropIndexes();
+//		try {
+//			collection.createIndex(key, "geospatialIdx");
+//		}
+//		catch (MongoException e) {
+//			LOGGER.error("MongoException :: {}", e.getMessage(), e);
+//		}
+//	}
 
 	/**
 	 * <p>

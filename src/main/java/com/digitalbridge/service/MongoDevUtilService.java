@@ -7,6 +7,10 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
+import com.mongodb.*;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.connection.ClusterConnectionMode;
 import org.bson.Document;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -33,12 +37,6 @@ import com.digitalbridge.mongodb.repository.AddressRepository;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 import com.digitalbridge.mongodb.repository.NotesRepository;
 import com.digitalbridge.util.Constants;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoCredential;
-import com.mongodb.MongoException;
-import com.mongodb.ReadPreference;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -78,12 +76,17 @@ public class MongoDevUtilService {
 	@RequestMapping(value = "/extractRestaurants")
 	@Secured({ "ROLE_USER" })
 	public String extractRestaurants() throws InterruptedException {
-		List<MongoCredential> credentialsList = new ArrayList<>();
-		credentialsList.add(MongoCredential.createCredential("testAdmin", "test",
-				"password".toCharArray()));
+		MongoCredential credential = MongoCredential.createCredential("testAdmin", "test",
+				"password".toCharArray());
 		ServerAddress addr = new ServerAddress(
 				new InetSocketAddress(Constants.LOCALHOST, Constants.PRIMARYPORT));
-		MongoClient mongoClient = new MongoClient(addr, credentialsList);
+		MongoClient mongoClient = MongoClients.create(
+				MongoClientSettings.builder()
+						.credential(credential)
+						.applyToClusterSettings(builder ->
+								builder.mode(ClusterConnectionMode.SINGLE).hosts(List.of(addr))
+										)
+						.build());
 		final MongoDatabase database = mongoClient.getDatabase("test");
 		MongoCollection<Document> collection = database.getCollection("restaurants",
 				Document.class);
@@ -104,7 +107,7 @@ public class MongoDevUtilService {
 		addressRepository.deleteAll();
 		notesRepository.deleteAll();
 		assetWrapperRepository.deleteAll();
-		List<AssetWrapper> assetWrapperList = new ArrayList<AssetWrapper>();
+		List<AssetWrapper> assetWrapperList = new ArrayList<>();
 		for (Document res : resultList) {
 			AssetWrapper assetwrapper = new AssetWrapper();
 			assetwrapper.setId(res.get("_id").toString());
@@ -114,8 +117,8 @@ public class MongoDevUtilService {
 			String val = addressDocument.get("coord").toString().replace("[", "")
 					.replace("]", "");
 			if (val != null && val.length() > 0) {
-				Point point = new Point(Double.valueOf(val.split(",")[0]),
-						Double.valueOf(val.split(",")[1]));
+				Point point = new Point(Double.parseDouble(val.split(",")[0]),
+						Double.parseDouble(val.split(",")[1]));
 				address.setLocation(new GeoJsonPoint(point));
 			}
 			address.setStreet(addressDocument.getString("street"));
@@ -143,7 +146,7 @@ public class MongoDevUtilService {
 			assetWrapperList.add(assetwrapper);
 		}
 		try {
-			assetWrapperRepository.save(assetWrapperList);
+			assetWrapperRepository.saveAll(assetWrapperList);
 		}
 		catch (MongoException e) {
 			LOGGER.error("Exception :{}", e.getMessage(), e);
@@ -158,9 +161,9 @@ public class MongoDevUtilService {
 	@RequestMapping(value = "/updateDate")
 	public void updateDate() {
 		int i = Constants.ZERO;
-		Page<AssetWrapper> all = null;
+		Page<AssetWrapper> all;
 		do {
-			all = assetWrapperRepository.findAll(new PageRequest(i, Constants.PAGESIZE));
+			all = assetWrapperRepository.findAll(PageRequest.of(i, Constants.PAGESIZE));
 			for (AssetWrapper assetWrapper : all) {
 				if (Integer.parseInt(assetWrapper.getOrgAssetId())
 						% Constants.TWELVE == Constants.ONE) {
@@ -255,14 +258,16 @@ public class MongoDevUtilService {
 	@RequestMapping(value = "/replicaStatus")
 	public void verifySetMembers() throws Exception {
 
-		List<MongoCredential> credentialsList = new ArrayList<MongoCredential>();
-		credentialsList.add(MongoCredential.createCredential("appAdmin", "admin",
-				"password".toCharArray()));
+		MongoCredential mongoCredential = MongoCredential.createCredential("appAdmin", "admin",
+				"password".toCharArray());
 		ServerAddress addr = new ServerAddress(
 				new InetSocketAddress(Constants.LOCALHOST, Constants.TERITORYPORT));
-		MongoClientOptions mongoClientOptions = MongoClientOptions.builder()
-				.readPreference(ReadPreference.secondaryPreferred()).build();
-		MongoClient mongo = new MongoClient(addr, credentialsList, mongoClientOptions);
+		MongoClient mongo = MongoClients.create(MongoClientSettings.builder()
+				.credential(mongoCredential)
+				.readPreference(ReadPreference.secondaryPreferred())
+				.applyToClusterSettings(builder -> builder.hosts(List.of(addr)))
+				.build());
+//				MongoClient mongo = new MongoClient(addr, credentialsList, mongoClientOptions);
 		// mongo.slaveOk();
 		// mongo.getDatabase("deloitte").getCollection("assetwrapper").drop();
 		final Document result = mongo.getDatabase("admin")

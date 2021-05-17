@@ -1,29 +1,43 @@
 package com.digitalbridge.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.digitalbridge.domain.AssetWrapper;
+import com.digitalbridge.domain.FacetDateRange;
+import com.digitalbridge.exception.DigitalBridgeException;
+import com.digitalbridge.exception.DigitalBridgeExceptionBean;
+import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
+import com.digitalbridge.util.Constants;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
+import io.searchbox.action.Action;
+import io.searchbox.client.JestResult;
+import io.searchbox.client.http.JestHttpClient;
+import io.searchbox.cluster.Health;
+import io.searchbox.core.*;
+import io.searchbox.core.Bulk.Builder;
+import io.searchbox.core.search.aggregation.DateRangeAggregation;
+import io.searchbox.core.search.aggregation.DateRangeAggregation.DateRange;
+import io.searchbox.core.search.aggregation.TermsAggregation;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.Optimize;
+import io.searchbox.indices.Refresh;
+import io.searchbox.indices.Stats;
+import io.searchbox.indices.mapping.PutMapping;
+import io.searchbox.params.Parameters;
+import io.searchbox.params.SearchType;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.common.Base64;
-import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.range.date.DateRangeBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms.Order;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
+import org.elasticsearch.search.aggregations.BucketOrder;
+import org.elasticsearch.search.aggregations.bucket.range.DateRangeAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,39 +53,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.digitalbridge.domain.AssetWrapper;
-import com.digitalbridge.domain.FacetDateRange;
-import com.digitalbridge.exception.DigitalBridgeException;
-import com.digitalbridge.exception.DigitalBridgeExceptionBean;
-import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
-import com.digitalbridge.util.Constants;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSyntaxException;
-
-import io.searchbox.action.Action;
-import io.searchbox.client.JestResult;
-import io.searchbox.client.http.JestHttpClient;
-import io.searchbox.cluster.Health;
-import io.searchbox.core.Bulk;
-import io.searchbox.core.Bulk.Builder;
-import io.searchbox.core.Delete;
-import io.searchbox.core.DocumentResult;
-import io.searchbox.core.Index;
-import io.searchbox.core.Search;
-import io.searchbox.core.SearchResult;
-import io.searchbox.core.SearchScroll;
-import io.searchbox.core.search.aggregation.DateRangeAggregation;
-import io.searchbox.core.search.aggregation.DateRangeAggregation.DateRange;
-import io.searchbox.core.search.aggregation.TermsAggregation;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.Optimize;
-import io.searchbox.indices.Refresh;
-import io.searchbox.indices.Stats;
-import io.searchbox.indices.mapping.PutMapping;
-import io.searchbox.params.Parameters;
-import io.searchbox.params.SearchType;
+import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -174,8 +161,8 @@ public class ElasticSearchOperations {
 				throw new DigitalBridgeException(bean);
 
 			}
-			if (e.getMessage().toString().contains("Read timed out")) {
-				LOGGER.error("IOException occured while attempting to search {}",
+			if (e.getMessage().contains("Read timed out")) {
+				LOGGER.error("IOException occurred while attempting to search {}",
 						e.getMessage(), e);
 				DigitalBridgeExceptionBean bean = new DigitalBridgeExceptionBean();
 				bean.setFaultCode("1005");
@@ -186,7 +173,7 @@ public class ElasticSearchOperations {
 
 		Page<AssetWrapper> res = null;
 		if (assetIds != null && !assetIds.isEmpty()) {
-			res = assetWrapperRepository.findByIdIn(assetIds, new PageRequest(
+			res = assetWrapperRepository.findByIdIn(assetIds, PageRequest.of(
 					Constants.ZERO, Constants.THREE, Direction.ASC, "aName"));
 		}
 
@@ -221,11 +208,11 @@ public class ElasticSearchOperations {
 					FacetDateRange[] facetDateRange = convertObjectToFacetDateRange(
 							termFilter.getValue());
 					BoolQueryBuilder orFilterBuilder = new BoolQueryBuilder();
-					for (int i = 0; i < facetDateRange.length; i++) {
+					for (FacetDateRange dateRange : facetDateRange) {
 						RangeQueryBuilder rangeFilterBuilder = new RangeQueryBuilder(
 								termFilter.getKey());
-						rangeFilterBuilder.gte(facetDateRange[i].getStartDate());
-						rangeFilterBuilder.lte(facetDateRange[i].getEndDate());
+						rangeFilterBuilder.gte(dateRange.getStartDate());
+						rangeFilterBuilder.lte(dateRange.getEndDate());
 						orFilterBuilder.should(rangeFilterBuilder);
 					}
 					queryFilters.must(orFilterBuilder);
@@ -243,11 +230,11 @@ public class ElasticSearchOperations {
 			searchSourceBuilder.query(queryBuilder);
 		}
 
-		TermsBuilder cuisineTermsBuilder = AggregationBuilders.terms("MyCuisine")
-				.field("cuisine").size(SIZE).order(Order.count(false));
-		TermsBuilder boroughTermsBuilder = AggregationBuilders.terms("MyBorough")
-				.field("borough").size(SIZE).order(Order.count(false));
-		DateRangeBuilder dateRangeBuilder = AggregationBuilders.dateRange("MyDateRange")
+		TermsAggregationBuilder cuisineTermsBuilder = AggregationBuilders.terms("MyCuisine")
+				.field("cuisine").size(SIZE).order(BucketOrder.count(false));
+		TermsAggregationBuilder boroughTermsBuilder = AggregationBuilders.terms("MyBorough")
+				.field("borough").size(SIZE).order(BucketOrder.count(false));
+		DateRangeAggregationBuilder dateRangeBuilder = AggregationBuilders.dateRange("MyDateRange")
 				.field("lDate");
 		addDateRange(dateRangeBuilder);
 
@@ -255,7 +242,7 @@ public class ElasticSearchOperations {
 		searchSourceBuilder.aggregation(boroughTermsBuilder);
 		searchSourceBuilder.aggregation(dateRangeBuilder);
 
-		LOGGER.info("Query : {}", searchSourceBuilder.toString());
+		LOGGER.info("Query : {}", searchSourceBuilder);
 		Search search = new Search.Builder(searchSourceBuilder.toString())
 				.addIndex(INDEX_NAME).addType(TYPE).setHeader(getHeader())
 				.refresh(refresh).setSearchType(SearchType.DFS_QUERY_THEN_FETCH).build();
@@ -330,12 +317,7 @@ public class ElasticSearchOperations {
 	 * @return
 	 */
 	private boolean isKeyDateRangeKey(String key) {
-		if (Constants.DATEFIELDLIST.contains(key)) {
-			return true;
-		}
-		else {
-			return false;
-		}
+		return Constants.DATEFIELDLIST.contains(key);
 	}
 
 	/**
@@ -355,15 +337,17 @@ public class ElasticSearchOperations {
 	/**
 	 * @param dateRangeBuilder
 	 */
-	private void addDateRange(DateRangeBuilder dateRangeBuilder) {
-		DateTime startMonthDate = new DateTime(DateTimeZone.UTC)
-				.withDayOfMonth(Constants.ONE).withTimeAtStartOfDay();
+	private void addDateRange(DateRangeAggregationBuilder dateRangeBuilder) {
+		ZonedDateTime startMonthDate = ZonedDateTime.now(ZoneId.of("UTC"))
+				.withDayOfMonth(Constants.ONE)
+				.with(ChronoField.HOUR_OF_DAY, 0);
 		dateRangeBuilder.addUnboundedTo(startMonthDate.minusMonths(Constants.TWELVE));
 		for (int i = Constants.TWELVE; i > Constants.ZERO; i--) {
 			dateRangeBuilder.addRange(startMonthDate.minusMonths(i),
-					startMonthDate.minusMonths(i - 1).minusMillis(Constants.ONE));
+					startMonthDate.minusMonths(i - 1).minusSeconds(Constants.ONE));
 		}
 		dateRangeBuilder.addUnboundedFrom(startMonthDate);
+
 	}
 
 	/**
@@ -384,11 +368,11 @@ public class ElasticSearchOperations {
 		}
 		catch (JsonSyntaxException e) {
 			LOGGER.error(
-					"JsonSyntaxException occured while attempting to create GeoPointMapping",
+					"JsonSyntaxException occurred while attempting to create GeoPointMapping :{}",
 					e.getMessage(), e);
 		}
 		catch (Exception e) {
-			LOGGER.error("Exception occured while attempting to create GeoPointMapping",
+			LOGGER.error("Exception occurred while attempting to create GeoPointMapping :{}",
 					e.getMessage(), e);
 		}
 	}
@@ -406,11 +390,11 @@ public class ElasticSearchOperations {
 	@RequestMapping(value = "/createIndexes/{indexName}")
 	public JestResult createIndexes(@PathVariable("indexName") String indexName)
 			throws DigitalBridgeException {
-		Settings.Builder settingsBuilder = Settings.settingsBuilder();
+		Map<String, Object> settingsBuilder = new HashMap<>();
 		settingsBuilder.put("number_of_shards", Constants.FIVE);
 		settingsBuilder.put("number_of_replicas", Constants.ONE);
 		CreateIndex indexBuilder = new CreateIndex.Builder(indexName.toLowerCase())
-				.setHeader(getHeader()).settings(settingsBuilder.build().getAsMap())
+				.setHeader(getHeader()).settings(settingsBuilder)
 				.build();
 		return handleResult(indexBuilder);
 	}
@@ -482,7 +466,7 @@ public class ElasticSearchOperations {
 	@RequestMapping(value = "refreshIndex/{indexName}")
 	public JestResult refreshIndex(@PathVariable("indexName") String indexName)
 			throws DigitalBridgeException {
-		Refresh refresh = null;
+		Refresh refresh;
 		if (indexName != null && indexName.trim().length() > 0) {
 			refresh = new Refresh.Builder().addIndex(indexName).setHeader(getHeader())
 					.build();
@@ -628,7 +612,7 @@ public class ElasticSearchOperations {
 
 	private Map<String, Object> getHeader() {
 		return Collections.singletonMap("Authorization",
-				"Basic " + Base64.encodeBytes("admin:admin_pw".getBytes()));
+				"Basic " + Base64.getEncoder().encodeToString("admin:admin_pw".getBytes()));
 	}
 
 	/**

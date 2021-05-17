@@ -52,7 +52,7 @@ public class AddressService {
 			RequestMethod.PUT }, headers = "Accept=application/json")
 	public Address updateSetValue(String assetID, Map<String, Object> value) {
 		LOGGER.debug("received update request for assetID {}", assetID);
-		String addressID = assetWrapperRepository.findOne(assetID).getAddress().getId();
+		String addressID = assetWrapperRepository.findById(assetID).get().getAddress().getId();
 		Query query = new Query(Criteria.where("_id").is(addressID));
 		Update update = new Update();
 		for (Entry<String, Object> entry : value.entrySet()) {
