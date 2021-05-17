@@ -60,14 +60,6 @@ import java.time.temporal.ChronoField;
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * <p>
- * ElasticSearchOperations class.
- * </p>
- *
- * @author rajakolli
- * @version 1: 0
- */
 @RequestMapping(value = "/assetwrapper/search")
 @RestController
 public class ElasticSearchOperations {

@@ -1,20 +1,11 @@
 package com.digitalbridge.util;
 
+import java.util.Base64;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-import java.util.Base64;
-
-/**
- * <p>
- * AuthorizationHeader class.
- * </p>
- *
- * @author rajakolli
- * @version 1:0
- */
 @RequestMapping(value = "/digitalbridge/search")
 @RestController
 public class AuthorizationHeader {

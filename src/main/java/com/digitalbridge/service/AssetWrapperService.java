@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.mongodb.client.MongoCollection;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,18 +33,6 @@ import com.digitalbridge.domain.AssetWrapper;
 import com.digitalbridge.mongodb.repository.AddressRepository;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 import com.digitalbridge.util.Constants;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.MongoException;
-
-/**
- * <p>
- * AssetWrapperService class.
- * </p>
- *
- * @author rajakolli
- * @version 1: 0
- */
 
 @RestController
 @RequestMapping(value = "/assetwrapper/search")

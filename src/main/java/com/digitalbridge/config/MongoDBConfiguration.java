@@ -2,32 +2,31 @@ package com.digitalbridge.config;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.connection.ClusterConnectionMode;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.data.mongodb.MongoDatabaseFactory;
-import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoExceptionTranslator;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
-import org.springframework.data.mongodb.core.convert.*;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import com.digitalbridge.mongodb.audit.MongoAuditorProvider;
 import com.digitalbridge.mongodb.convert.ObjectConverters;
 import com.digitalbridge.mongodb.event.CascadeSaveMongoEventListener;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.connection.ClusterConnectionMode;
 
 @Configuration(proxyBeanMethods = false)
 public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
@@ -100,6 +99,7 @@ public class MongoDBConfiguration extends AbstractMongoClientConfiguration {
 	}
 
 	@Bean
+	@Primary
 	public MappingMongoConverter mongoConverter() {
 		MongoMappingContext mappingContext = new MongoMappingContext();
 		mappingContext.setAutoIndexCreation(true);

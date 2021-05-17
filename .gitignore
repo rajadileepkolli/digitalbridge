@@ -2,3 +2,7 @@
 .idea/
 build/
 data/
+bin/
+.settings/
+.classpath
+.project
