@@ -1,30 +1,20 @@
 package com.digitalbridge.domain;
 
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
+import com.digitalbridge.annotation.CascadeSave;
+import com.digitalbridge.annotation.CascadeSaveList;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
+import org.springframework.data.annotation.*;
 import org.springframework.data.mongodb.core.index.IndexDirection;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import com.digitalbridge.annotation.CascadeSave;
-import com.digitalbridge.annotation.CascadeSaveList;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * <p>
@@ -69,19 +59,15 @@ public class AssetWrapper {
 	@CreatedBy
 	private String createdBy;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@DateTimeFormat(style = "M-")
 	@CreatedDate
-	private Date createdDate;
+	private LocalDateTime createdDate;
 
 	@LastModifiedBy
 	private String lastModifiedBy;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@DateTimeFormat(style = "M-")
 	@LastModifiedDate
 	@Field("lDate")
-	private Date lastmodifiedDate;
+	private LocalDateTime lastmodifiedDate;
 
 	/**
 	 * <p>
@@ -281,25 +267,11 @@ public class AssetWrapper {
 		this.createdBy = createdBy;
 	}
 
-	/**
-	 * <p>
-	 * Getter for the field <code>createdDate</code>.
-	 * </p>
-	 *
-	 * @return a {@link java.util.Date} object.
-	 */
-	public Date getCreatedDate() {
+	public LocalDateTime getCreatedDate() {
 		return createdDate;
 	}
 
-	/**
-	 * <p>
-	 * Setter for the field <code>createdDate</code>.
-	 * </p>
-	 *
-	 * @param createdDate a {@link java.util.Date} object.
-	 */
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(LocalDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
 
@@ -325,25 +297,11 @@ public class AssetWrapper {
 		this.lastModifiedBy = lastModifiedBy;
 	}
 
-	/**
-	 * <p>
-	 * Getter for the field <code>lastmodifiedDate</code>.
-	 * </p>
-	 *
-	 * @return a {@link java.util.Date} object.
-	 */
-	public Date getLastmodifiedDate() {
+	public LocalDateTime getLastmodifiedDate() {
 		return lastmodifiedDate;
 	}
 
-	/**
-	 * <p>
-	 * Setter for the field <code>lastmodifiedDate</code>.
-	 * </p>
-	 *
-	 * @param lastmodifiedDate a {@link java.util.Date} object.
-	 */
-	public void setLastmodifiedDate(Date lastmodifiedDate) {
+	public void setLastmodifiedDate(LocalDateTime lastmodifiedDate) {
 		this.lastmodifiedDate = lastmodifiedDate;
 	}
 

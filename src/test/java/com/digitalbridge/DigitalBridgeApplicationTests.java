@@ -1,42 +1,38 @@
 package com.digitalbridge;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.restdocs.RestDocumentation;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-
+import com.digitalbridge.config.MongoDbContainer;
 import com.digitalbridge.mongodb.repository.AddressRepository;
 import com.digitalbridge.mongodb.repository.AssetWrapperRepository;
 import com.digitalbridge.mongodb.repository.NotesRepository;
 import com.digitalbridge.mongodb.repository.UserRepository;
 import com.digitalbridge.service.AddressService;
 import com.digitalbridge.service.AssetWrapperService;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = DigitalBridgeApplication.class)
-@WebAppConfiguration
-@ActiveProfiles("local")
-public abstract class DigitalBridgeApplicationTests {
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith({RestDocumentationExtension.class, SpringExtension.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public abstract class DigitalBridgeApplicationTests extends MongoDbContainer {
 
 	protected static final String assetID = "56094694bd51636546272ee8";
 	protected static final String USERNAME = "JUNIT_TEST";
@@ -44,9 +40,6 @@ public abstract class DigitalBridgeApplicationTests {
 	protected static final String ROLE_USER = "ROLE_USER";
 	protected static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-	@Rule
-	public final RestDocumentation restDocumentation = new RestDocumentation(
-			"build/generated-snippets");
 
 	@Autowired
 	protected AssetWrapperService assetWrapperService;
@@ -67,22 +60,23 @@ public abstract class DigitalBridgeApplicationTests {
 
 	@Autowired
 	private WebApplicationContext context;
+
 	protected MockMvc mockMvc;
 
-	protected Pageable pageable = new PageRequest(0, 10);
+	protected Pageable pageable = PageRequest.of(0, 10);
 
-	@Before
-	public void setUp() {
+	@BeforeAll
+	public void setUp(RestDocumentationContextProvider restDocumentation) {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
-				.apply(documentationConfiguration(this.restDocumentation))
+				.apply(documentationConfiguration(restDocumentation))
 				.alwaysDo(document("{method-name}/{step}/",
 						preprocessRequest(prettyPrint()),
 						preprocessResponse(prettyPrint())))
 				.apply(SecurityMockMvcConfigurers.springSecurity()).build();
 	}
 
-	@After
-	public void tearDown() throws Exception {
+	@AfterAll
+	public void tearDown() {
 		SecurityContextHolder.clearContext();
 	}
 

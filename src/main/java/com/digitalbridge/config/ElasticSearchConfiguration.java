@@ -1,11 +1,11 @@
 package com.digitalbridge.config;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -17,27 +17,15 @@ import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
 import io.searchbox.client.http.JestHttpClient;
 
-/**
- * <p>
- * ElasticSearchConfiguration class.
- * </p>
- *
- * @author rajakolli
- * @version 1:0
- */
-@Configuration
+@Configuration(proxyBeanMethods = false)
 public class ElasticSearchConfiguration {
 
-	@Autowired
-	Environment env;
+	private final Environment env;
 
-	/**
-	 * <p>
-	 * jestClient.
-	 * </p>
-	 *
-	 * @return a {@link io.searchbox.client.http.JestHttpClient} object.
-	 */
+	public ElasticSearchConfiguration(Environment env) {
+		this.env = env;
+	}
+
 	@Bean
 	public JestHttpClient jestClient() {
 		// Construct a new Jest client according to configuration via factory
@@ -55,35 +43,15 @@ public class ElasticSearchConfiguration {
 		return jestHttpClient;
 	}
 
-	/**
-	 * <p>
-	 * localConnectionURL.
-	 * </p>
-	 *
-	 * @return a {@link java.util.List} object.
-	 */
+
 	public List<String> localConnectionURL() {
-		return Arrays.asList("http://127.0.0.1:9200");
+		return Collections.singletonList("http://127.0.0.1:9200");
 	}
 
-	/**
-	 * <p>
-	 * iLabConnectionURL.
-	 * </p>
-	 *
-	 * @return a {@link java.util.List} object.
-	 */
 	public List<String> iLabConnectionURL() {
-		return Arrays.asList("http://152.190.139.77:9200");
+		return Collections.singletonList("http://xx.xx.xx.xx:9200");
 	}
 
-	/**
-	 * <p>
-	 * getConnectionURL.
-	 * </p>
-	 *
-	 * @return a {@link java.util.List} object.
-	 */
 	public List<String> getConnectionURL() {
 		if (findProfile("iLab")) {
 			return iLabConnectionURL();

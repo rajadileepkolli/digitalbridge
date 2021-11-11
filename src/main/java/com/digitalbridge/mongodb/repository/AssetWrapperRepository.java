@@ -31,147 +31,38 @@ import com.digitalbridge.domain.AssetWrapper;
 @PreAuthorize("hasRole('ROLE_USER')")
 public interface AssetWrapperRepository extends MongoRepository<AssetWrapper, String> {
 
-	/**
-	 * <p>
-	 * findAll.
-	 * </p>
-	 *
-	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
-	 * @return a {@link org.springframework.data.domain.Page} object.
-	 */
 	@Async
 	Page<AssetWrapper> findAll(Pageable pageable);
 
-	/**
-	 * <p>
-	 * findByAddressLocationNull.
-	 * </p>
-	 *
-	 * @return a {@link java.util.List} object.
-	 */
 	@Async
 	Future<AssetWrapper> findByAddressLocationNull();
 
-	/**
-	 * <p>
-	 * save.
-	 * </p>
-	 *
-	 * @param s a S object.
-	 * @return a S object.
-	 */
 	<S extends AssetWrapper> S save(S s);
 
-	/**
-	 * <p>
-	 * delete.
-	 * </p>
-	 *
-	 * @param aString a {@link java.lang.String} object.
-	 */
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	void delete(String aString);
 
-	/**
-	 * <p>
-	 * findByGradesScoreGreaterThanEqual.
-	 * </p>
-	 *
-	 * @param score a {@link java.lang.Integer} object.
-	 * @return a {@link java.util.List} object.
-	 */
 	List<AssetWrapper> findByNotesScoreGreaterThanEqual(@Param("score") Integer score);
 
-	/**
-	 * <p>
-	 * findByAddressLocationWithin.
-	 * </p>
-	 *
-	 * @param circle a {@link org.springframework.data.geo.Circle} object.
-	 * @return a {@link org.springframework.data.geo.GeoResults} object.
-	 */
 	GeoResults<AssetWrapper> findByAddressLocationWithin(Circle circle);
 
-	/**
-	 * <p>
-	 * findByAddressLocationWithinAndNameIsNotNull.
-	 * </p>
-	 *
-	 * @param box a {@link org.springframework.data.geo.Box} object.
-	 * @return a {@link org.springframework.data.domain.Slice} object.
-	 */
 	Slice<AssetWrapper> findByAddressLocationWithinAndAssetNameIsNotNull(Box box);
 
-	/**
-	 * <p>
-	 * findByCuisine.
-	 * </p>
-	 *
-	 * @param cuisine a {@link java.lang.String} object.
-	 * @return a {@link java.util.List} object.
-	 */
 	List<AssetWrapper> findByCuisine(@Param("cuisine") String cuisine);
 
-	/**
-	 * <p>
-	 * queryFirst10ByAssetName.
-	 * </p>
-	 *
-	 * @param assetName a {@link java.lang.String} object.
-	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
-	 * @return a {@link org.springframework.data.domain.Page} object.
-	 */
 	Page<AssetWrapper> queryFirst10ByAssetName(@Param("assetName") String assetName,
 			Pageable pageable);
 
-	/**
-	 * <p>
-	 * findTop3ByAssetName.
-	 * </p>
-	 *
-	 * @param assetName a {@link java.lang.String} object.
-	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
-	 * @return a {@link org.springframework.data.domain.Slice} object.
-	 */
 	Slice<AssetWrapper> findTop3ByAssetName(@Param("assetName") String assetName,
 			Pageable pageable);
 
-	/**
-	 * <p>
-	 * findByIdIn.
-	 * </p>
-	 *
-	 * @param assetIds a {@link java.util.List} object.
-	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
-	 * @return a {@link org.springframework.data.domain.Page} object.
-	 */
 	Page<AssetWrapper> findByIdIn(@Param("assetIds") List<String> assetIds,
 			Pageable pageable);
 
-	/**
-	 * <p>
-	 * findByAddressLocationNearAndIdIn.
-	 * </p>
-	 *
-	 * @param point a {@link org.springframework.data.geo.Point} object.
-	 * @param distance a {@link org.springframework.data.geo.Distance} object.
-	 * @param assetIds a {@link java.util.List} object.
-	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
-	 * @return a {@link org.springframework.data.domain.Page} object.
-	 */
 	Page<AssetWrapper> findByAddressLocationNearAndIdIn(@Param("point") Point point,
 			@Param("distance") Distance distance,
 			@Param("assetIds") List<String> assetIds, Pageable pageable);
 
-	/**
-	 * <p>
-	 * findByAddressIdIn.
-	 * </p>
-	 *
-	 * @param assetIds a {@link java.util.List} object.
-	 * @param pageable a {@link org.springframework.data.domain.Pageable} object.
-	 * @return a {@link org.springframework.data.domain.Page} object.
-	 */
 	Page<AssetWrapper> findByAddressIdIn(List<String> assetIds, Pageable pageable);
 
 }
